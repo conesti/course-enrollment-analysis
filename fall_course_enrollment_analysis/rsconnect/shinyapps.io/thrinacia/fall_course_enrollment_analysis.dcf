@@ -1,0 +1,12 @@
+name: fall_course_enrollment_analysis
+title: fall_course_enrollment_analysis
+username:
+account: thrinacia
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 886257
+bundleId: 2042494
+url: https://thrinacia.shinyapps.io/fall_course_enrollment_analysis/
+when: 1556321892.22692
+asMultiple: FALSE
+asStatic: FALSE
