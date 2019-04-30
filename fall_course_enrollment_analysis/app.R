@@ -87,18 +87,45 @@ server <- function(input, output) {
   #The next step is to fulfill this same code execution with the other years so that the data can later be combined.
   
   enrollment_seventeen <- read_excel("fall_2017.xlsx", skip = 3) %>% 
+    
+    #Then one is only interested in course entries, not totals.
+    
     filter(!is.na(`Course Title`)) %>% 
+    
+    #Next, one is only interested in courses with a significant number of undergraduates.
+    
     filter(UGrad >= 3) %>% 
+    
+    #Next, one is only interested in this part of the data.
+    
     select(ID =`Course ID`, Title = `Course Title`, Department = `Course Department`, Enrolled = `UGrad`)
   
   enrollment_sixteen <- read_excel("fall_2016.xlsx", skip = 3) %>% 
+    
+    #Then one is only interested in course entries, not totals.
+    
     filter(!is.na(`Course Title`)) %>% 
+    
+    #Next, one is only interested in courses with a significant number of undergraduates.
+    
     filter(UGrad >= 3) %>% 
+    
+    #Next, one is only interested in this part of the data.
+    
     select(ID =`Course ID`, Title = `Course Title`, Department = `Course Department`, Enrolled = `UGrad`)
   
   enrollment_fifteen <- read_excel("fall_2015.xlsx", skip = 0) %>% 
-    filter(!is.na(`COURSE ID`)) %>% 
+    
+    #Then one is only interested in course entries, not totals.
+    
+    filter(!is.na(`COURSE ID`)) %>%
+    
+    #Next, one is only interested in courses with a significant number of undergraduates.
+    
     filter(HCOL >= 3) %>% 
+    
+    #Next, one is only interested in this part of the data.
+    
     select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Enrolled = `HCOL`)
   
   #Next, one combines all the data into one large dataset so that they can all be accessed in the same place.
