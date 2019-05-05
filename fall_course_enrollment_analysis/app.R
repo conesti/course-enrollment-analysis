@@ -13,6 +13,8 @@ library(tidyverse)
 library(dplyr)
 library(readxl)
 library(ggthemes)
+library(viridis)
+library(ggridges)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -25,7 +27,10 @@ ui <- fluidPage(
       sidebarPanel(
          selectInput("year",
                      "Select a Year",
-                     c("2018", "2017", "2016", "2015"),
+                     c("2018", 
+                       "2017", 
+                       "2016", 
+                       "2015"),
                      selected = "2018"
          )
       ),
@@ -67,7 +72,7 @@ server <- function(input, output) {
    
   #One begins withi the first data set for the 2018 data
   
-  enrollment_eighteen <- read_excel("fall_2018.xlsx", skip = 2) %>% 
+  enrollment_eighteen_fall <- read_excel("fall_course_enrollment_analysis/fall_2018.xlsx", skip = 2) %>% 
     
     #Next, one filters the courses where the title is NA
     
@@ -80,13 +85,24 @@ server <- function(input, output) {
     #Next, one is only interstested in certain columns, so they are not selected here.
     
     select(ID =`Course ID`, 
+           
+           #The title is named Title
+           
            Title = `Course Title`, 
-           Department = `Course Department`, 
-           Enrolled = `UGrad`)
+           
+           #Next, the department variable is also named in a simple way
+           
+           Department = `Course Department`,
+           
+           #Next one has undergraduates labeled.
+           
+           Undergraduates = `UGrad`)
+  
   
   #The next step is to fulfill this same code execution with the other years so that the data can later be combined.
   
-  enrollment_seventeen <- read_excel("fall_2017.xlsx", skip = 3) %>% 
+  enrollment_seventeen_fall <- read_excel("fall_course_enrollment_analysis/fall_2017.xlsx", 
+                                     skip = 3) %>% 
     
     #Then one is only interested in course entries, not totals.
     
@@ -98,9 +114,21 @@ server <- function(input, output) {
     
     #Next, one is only interested in this part of the data.
     
-    select(ID =`Course ID`, Title = `Course Title`, Department = `Course Department`, Enrolled = `UGrad`)
+    select(ID =`Course ID`, 
+           
+          #Title replaces "Course Title" for a simpler name
+           
+           Title = `Course Title`, 
+          
+          #Department is used to refer to Course Department
+          
+           Department = `Course Department`, 
+          
+          #Undergraduates is then used for the undergraduate count
+          
+           Undergraduates = `UGrad`)
   
-  enrollment_sixteen <- read_excel("fall_2016.xlsx", skip = 3) %>% 
+  enrollment_sixteen_fall <- read_excel("fall_course_enrollment_analysis/fall_2016.xlsx", skip = 3) %>% 
     
     #Then one is only interested in course entries, not totals.
     
@@ -112,9 +140,21 @@ server <- function(input, output) {
     
     #Next, one is only interested in this part of the data.
     
-    select(ID =`Course ID`, Title = `Course Title`, Department = `Course Department`, Enrolled = `UGrad`)
+    select(ID =`Course ID`, 
+           
+           #Setting the title of Course titles to be "Title" for simplicity
+           
+           Title = `Course Title`, 
+           
+           #Department undergoes a similar cleaning
+           
+           Department = `Course Department`, 
+           
+           #The same for enrolled
+           
+           Undergraduates = `UGrad`)
   
-  enrollment_fifteen <- read_excel("fall_2015.xlsx", skip = 0) %>% 
+  enrollment_fifteen_fall <- read_excel("fall_course_enrollment_analysis/fall_2015.xlsx", skip = 0) %>% 
     
     #Then one is only interested in course entries, not totals.
     
@@ -126,23 +166,23 @@ server <- function(input, output) {
     
     #Next, one is only interested in this part of the data.
     
-    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Enrolled = `HCOL`)
+    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`)
   
   #Next, one combines all the data into one large dataset so that they can all be accessed in the same place.
   
-  enrollment <- bind_rows("2018" = enrollment_eighteen, 
+  enrollment_fall <- bind_rows("2018" = enrollment_eighteen_fall, 
                           
                           #And for 2017
                           
-                          "2017" = enrollment_seventeen, 
+                          "2017" = enrollment_seventeen_fall, 
                           
                           #And for 2016
                           
-                          "2016" = enrollment_sixteen, 
+                          "2016" = enrollment_sixteen_fall, 
                           
                           #And for 2015
                           
-                          "2015" = enrollment_fifteen, 
+                          "2015" = enrollment_fifteen_fall, 
                           
                           #Then the id is set to year so that one retains which year each row refers to
                           
@@ -162,7 +202,7 @@ server <- function(input, output) {
       
     #Next, the data is arranged by the largest enrolled value.
         
-    arrange(desc(Enrolled)) %>% 
+    arrange(desc(Undergraduates)) %>% 
     
     #Then the top 8 courses are selected.    
       
@@ -170,7 +210,7 @@ server <- function(input, output) {
     
     #Next, one begins the plot with courses on the x axis and the number of enrolled students on the y axis    
       
-    ggplot(aes(x = reorder(Title, -Enrolled), y = Enrolled, fill = Department)) + 
+    ggplot(aes(x = reorder(Title, -Undergraduates), y = Undergraduates, fill = Department)) + 
       
       #A column chart is necessary in this case because one is dealing with values an not frequencies.
       
@@ -195,6 +235,8 @@ server <- function(input, output) {
   })
       
     output$plot2 <- renderPlot({ 
+      
+        #Starting with the combined enrollment data set
     
         enrollment %>%
         
@@ -208,19 +250,24 @@ server <- function(input, output) {
         
         #Next, the plot begins.
         
-        ggplot(aes(x = Department, y = Enrolled, fill = Department)) +
+        ggplot(aes(x = Department, 
+                   
+                   #The y axis marks the numbered of enrolled undergraduates
+                   
+                   y = Undergraduates, 
+                   
+                   #The color is by department
+                   
+                   fill = Department)) +
         
         #Choosing a boxplot is helpful for showing data distributions.
         
-        geom_boxplot() + 
-        
-        #Next, the coordinates ar flipped for a horizontal view.
-        
-        coord_flip() +
+        geom_violin() + 
         
         #Then, the labels and titles are set.
         
-        labs(title = "Departments Enrollment Distributions Fluctuate Slightly Over Years", caption = "Harvard Registrar") +
+        labs(title = "Departments Enrollment Distributions Fluctuate Slightly Over Years", 
+             caption = "Source: Harvard Registrar") +
         
         #Next, the y-axis is labeled.
         
@@ -232,14 +279,16 @@ server <- function(input, output) {
         
         #Next, scaling the y-axis is necessary so that there is not a huge right tail on each of the datasets to account for very large classes.
         
-        scale_y_log10() +
+        scale_y_log10() + 
         
-        #The jitter allows the viewer to visualize the density a bit better.
+        #Next, the coordinates are flipped in order to make reading easier for the viewer
         
-        geom_jitter(alpha = .4, width = .2)
-    
-    
-    
+        coord_flip() + 
+        
+        #Next, the jitter is overlayed to demonstrate the density somehow
+        
+        geom_jitter()
+       
     })
   
 }
