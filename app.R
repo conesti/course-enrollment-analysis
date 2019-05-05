@@ -154,6 +154,8 @@ server <- function(input, output) {
            
            Undergraduates = `UGrad`)
   
+  #Next, one is interested in compiling 2015 fall data
+  
   enrollment_fifteen_fall <- read_excel("fall_course_enrollment_analysis/fall_2015.xlsx", skip = 0) %>% 
     
     #Then one is only interested in course entries, not totals.
@@ -187,6 +189,107 @@ server <- function(input, output) {
                           #Then the id is set to year so that one retains which year each row refers to
                           
                           .id = "Year")
+  
+  
+  
+  enrollment_sixteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2016.xlsx", skip = 0) %>% 
+    
+    #Then one is only interested in course entries, not totals.
+    
+    filter(!is.na(`COURSE ID`)) %>%
+    
+    #Next, one is only interested in courses with a significant number of undergraduates.
+    
+    filter(HCOL >= 3) %>% 
+    
+    #Next, one is only interested in this part of the data.
+    
+    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`)
+  
+  
+  enrollment_seventeen_spring <- read_excel("fall_course_enrollment_analysis/spring_2017.xlsx", skip = 3) %>% 
+    
+    #Then one is only interested in course entries, not totals.
+    
+    filter(!is.na(`COURSE ID`)) %>%
+    
+    #Next, one is only interested in courses with a significant number of undergraduates.
+    
+    filter(HCOL >= 3) %>% 
+    
+    #Next, one is only interested in this part of the data.
+    
+    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`)
+  
+  
+  enrollment_eighteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2018.xlsx", skip = 3) %>% 
+    
+    #Then one is only interested in course entries, not totals.
+    
+    filter(!is.na(`COURSE ID`)) %>%
+    
+    #Next, one is only interested in courses with a significant number of undergraduates.
+    
+    filter(HCOL >= 3) %>% 
+    
+    #Next, one is only interested in this part of the data.
+    
+    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`)
+  
+  
+  
+  enrollment_nineteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2019.xlsx", skip = 2) %>% 
+    
+    #Then one is only interested in course entries, not totals.
+    
+    filter(!is.na(`COURSE ID`)) %>%
+    
+    #Next, one is only interested in courses with a significant number of undergraduates.
+    
+    filter(HCOL >= 3) %>% 
+    
+    #Next, one is only interested in this part of the data.
+    
+    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`)
+  
+  
+  
+  
+  enrollment_spring <- bind_rows("2018" = enrollment_eighteen_spring, 
+                               
+                               #And for 2017
+                               
+                               "2017" = enrollment_seventeen_spring, 
+                               
+                               #And for 2016
+                               
+                               "2016" = enrollment_sixteen_spring, 
+                               
+                               #And for 2015
+                               
+                               "2019" = enrollment_nineteen_spring, 
+                               
+                               #Then the id is set to year so that one retains which year each row refers to
+                               
+                               .id = "Year")
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   #One begins with the first plot.
  
