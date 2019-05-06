@@ -20,18 +20,18 @@ library(ggridges)
 ui <- fluidPage(
    
    # Application title
-   titlePanel("Fall Course Enrollment Analysis"),
+   titlePanel("Course Enrollment Analysis"),
    
    # Sidebar with a slider input for number of bins 
    sidebarLayout(
       sidebarPanel(
          selectInput("year",
                      "Select a Year",
-                     c("2018", 
-                       "2017", 
-                       "2016", 
-                       "2015"),
-                     selected = "2018"
+                     c("2018-2019", 
+                       "2017-2018", 
+                       "2016-2017", 
+                       "2015-2016"),
+                     selected = "2018-2019"
          )
       ),
       
@@ -44,15 +44,15 @@ ui <- fluidPage(
         
          #The first panel shows the largest classes.                        
                     
-         tabPanel("Largest Classes", "This page is dedicated to showing the largest courses in the fall.  Use the selector on the left side of the screen to select a year and the chart will update showing the eight largest courses that semester.  The bars are also colored by department so one can easily see if there is a department with many or multiple courses in the top eight.  Finding large courses can be useful for identifying possible prerequisites for certain fields of study.", plotOutput("plot1")),
+         tabPanel("Largest Classes", plotOutput("plot1"), plotOutput("plot1.1")),
          
          #Next, one can observe distributions of how enrollment sizes across courses.
          
-         tabPanel("Distributions", "This tab shows various boxplots that demonstrate the distribution of course enrollment sizes by departments.  Right now, only a handful of the departments are shown, but in a future iteration of this page, one will be able to add more to the chart. ", plotOutput("plot2")),
+         tabPanel("Distributions", plotOutput("plot2"), plotOutput("plot2.1")),
          
          #The next panel will cover comparisons across departments.
          
-         tabPanel("Graduate vs. Undergraduate Enrollment", "This tab will compare graduate and undergraduate enrollment rate across courses grouped by department."),
+         tabPanel("Graduate vs. Undergraduate Enrollment", plotOutput("plot3")),
          
          #Then, there is a panel dedicated to explaining the project and providing 
          
@@ -60,16 +60,43 @@ ui <- fluidPage(
                   Feel free to flip through the tabs to see the various representations of the data.  Some of the tabs are yet to come.  Feel free to check out the github repository at: https://github.com/conesti/fall-course-enrollment-analysis.  I can also be reached at chrisonesti@gmail.com.")
          
          ) 
-         
-         
-         
       )
    )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-   
+  
+  spring_function <- function(x) {
+    if (x == "2015-2016") {
+      "2016"
+    }
+    else if (x == "2016-2017") {
+      "2017"
+    }
+    else if (x == "2017-2018") {
+      "2018"
+    }
+    else {
+      "2019"
+    }
+  }
+  
+  fall_function <- function(x) {
+    if (x == "2015-2016") {
+      "2015"
+    }
+    else if (x == "2016-2017") {
+      "2016"
+    }
+    else if (x == "2017-2018") {
+      "2017"
+    }
+    else {
+      "2018"
+    }
+  }
+  
   #One begins withi the first data set for the 2018 data
   
   enrollment_eighteen_fall <- read_excel("fall_course_enrollment_analysis/fall_2018.xlsx", skip = 2) %>% 
@@ -96,7 +123,9 @@ server <- function(input, output) {
            
            #Next one has undergraduates labeled.
            
-           Undergraduates = `UGrad`)
+           Undergraduates = `UGrad`,
+           
+           Graduates = `Grad`)
   
   
   #The next step is to fulfill this same code execution with the other years so that the data can later be combined.
@@ -126,7 +155,9 @@ server <- function(input, output) {
           
           #Undergraduates is then used for the undergraduate count
           
-           Undergraduates = `UGrad`)
+           Undergraduates = `UGrad`,
+           
+           Graduates = `Grad`)
   
   enrollment_sixteen_fall <- read_excel("fall_course_enrollment_analysis/fall_2016.xlsx", skip = 3) %>% 
     
@@ -152,7 +183,9 @@ server <- function(input, output) {
            
            #The same for enrolled
            
-           Undergraduates = `UGrad`)
+           Undergraduates = `UGrad`,
+           
+           Graduates = `Grad`)
   
   #Next, one is interested in compiling 2015 fall data
   
@@ -168,7 +201,9 @@ server <- function(input, output) {
     
     #Next, one is only interested in this part of the data.
     
-    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`)
+    select(ID = `COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`,
+           
+           Graduates = `GSAS`)
   
   #Next, one combines all the data into one large dataset so that they can all be accessed in the same place.
   
@@ -191,7 +226,6 @@ server <- function(input, output) {
                           .id = "Year")
   
   
-  
   enrollment_sixteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2016.xlsx", skip = 0) %>% 
     
     #Then one is only interested in course entries, not totals.
@@ -204,55 +238,97 @@ server <- function(input, output) {
     
     #Next, one is only interested in this part of the data.
     
-    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`)
+    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`,
+           
+           Graduates = `GSAS`)
   
   
   enrollment_seventeen_spring <- read_excel("fall_course_enrollment_analysis/spring_2017.xlsx", skip = 3) %>% 
     
     #Then one is only interested in course entries, not totals.
     
-    filter(!is.na(`COURSE ID`)) %>%
+    filter(!is.na(`Course ID`)) %>%
     
     #Next, one is only interested in courses with a significant number of undergraduates.
     
-    filter(HCOL >= 3) %>% 
+    filter(UGrad >= 3) %>% 
     
     #Next, one is only interested in this part of the data.
     
-    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`)
+    select(ID =`Course ID`, 
+           
+           #Setting the title of Course titles to be "Title" for simplicity
+           
+           Title = `Course Title`, 
+           
+           #Department undergoes a similar cleaning
+           
+           Department = `Course Department`, 
+           
+           #The same for enrolled
+           
+           Undergraduates = `UGrad`,
+           
+           Graduates = `Grad`)
   
   
   enrollment_eighteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2018.xlsx", skip = 3) %>% 
     
     #Then one is only interested in course entries, not totals.
     
-    filter(!is.na(`COURSE ID`)) %>%
+    filter(!is.na(`Course ID`)) %>%
     
     #Next, one is only interested in courses with a significant number of undergraduates.
     
-    filter(HCOL >= 3) %>% 
+    filter(UGrad >= 3) %>% 
     
     #Next, one is only interested in this part of the data.
     
-    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`)
+    select(ID =`Course ID`, 
+           
+           #Setting the title of Course titles to be "Title" for simplicity
+           
+           Title = `Course Title`, 
+           
+           #Department undergoes a similar cleaning
+           
+           Department = `Course Department`, 
+           
+           #The same for enrolled
+           
+           Undergraduates = `UGrad`,
+           
+           Graduates = `Grad`)
   
   
   
-  enrollment_nineteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2019.xlsx", skip = 2) %>% 
+  enrollment_nineteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2019.xlsx", skip = 3) %>% 
     
     #Then one is only interested in course entries, not totals.
     
-    filter(!is.na(`COURSE ID`)) %>%
+    filter(!is.na(`Course ID`)) %>%
     
     #Next, one is only interested in courses with a significant number of undergraduates.
     
-    filter(HCOL >= 3) %>% 
+    filter(UGrad >= 3) %>% 
     
     #Next, one is only interested in this part of the data.
     
-    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`)
-  
-  
+    select(ID =`Course ID`, 
+           
+           #Setting the title of Course titles to be "Title" for simplicity
+           
+           Title = `Course Title`, 
+           
+           #Department undergoes a similar cleaning
+           
+           Department = `Course Department`, 
+           
+           #The same for enrolled
+           
+           Undergraduates = `UGrad`,
+           
+           Graduates = `Grad`)
   
   
   enrollment_spring <- bind_rows("2018" = enrollment_eighteen_spring, 
@@ -265,7 +341,7 @@ server <- function(input, output) {
                                
                                "2016" = enrollment_sixteen_spring, 
                                
-                               #And for 2015
+                               #And for 2019
                                
                                "2019" = enrollment_nineteen_spring, 
                                
@@ -275,33 +351,17 @@ server <- function(input, output) {
   
   
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   #One begins with the first plot.
  
   output$plot1 <- renderPlot({ 
     
     #One begins with the original dataset
     
-    enrollment %>% 
+    enrollment_fall %>% 
       
     #Then one filters the year by an inputted value that the user will be able to specify.  
       
-    filter(Year == input$year) %>% 
+    filter(Year == fall_function(input$year)) %>% 
       
     #Next, the data is arranged by the largest enrolled value.
         
@@ -309,11 +369,55 @@ server <- function(input, output) {
     
     #Then the top 8 courses are selected.    
       
-    slice(1:8) %>% 
+    slice(1:10) %>% 
     
     #Next, one begins the plot with courses on the x axis and the number of enrolled students on the y axis    
       
     ggplot(aes(x = reorder(Title, -Undergraduates), y = Undergraduates, fill = Department)) + 
+      
+      #A column chart is necessary in this case because one is dealing with values an not frequencies.
+      
+      geom_col() +
+      
+      #The title is named so that the user can understand what the chart is about.
+      
+      labs(title = "Total Enrollment by Class in Selected Year", caption = "Source: Harvard Registrar") +
+      
+      #Next, the axis is labeled clearly.
+      
+      xlab("Course Title") +
+      
+      #The y axis follows.
+      
+      ylab("Number of Enrolled Undergraduates") + 
+      
+      #The minimal theme is applied for aesthetic purposes
+      
+      theme_minimal() 
+    
+  })
+  
+  output$plot1.1 <- renderPlot({ 
+    
+    #One begins with the original dataset
+    
+    enrollment_spring %>% 
+      
+      #Then one filters the year by an inputted value that the user will be able to specify.  
+      
+      filter(Year == spring_function(input$year)) %>% 
+      
+      #Next, the data is arranged by the largest enrolled value.
+      
+      arrange(desc(Undergraduates)) %>% 
+      
+      #Then the top 8 courses are selected.    
+      
+      slice(1:10) %>% 
+      
+      #Next, one begins the plot with courses on the x axis and the number of enrolled students on the y axis    
+      
+      ggplot(aes(x = reorder(Title, -Undergraduates), y = Undergraduates, fill = Department)) + 
       
       #A column chart is necessary in this case because one is dealing with values an not frequencies.
       
@@ -341,15 +445,15 @@ server <- function(input, output) {
       
         #Starting with the combined enrollment data set
     
-        enrollment %>%
+        enrollment_fall %>%
         
         #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
         
-        filter(Department %in% c("Government", "Economics", "Computer Science", "Statistics", "Physics", "Mathematics", "STAT", "SEAS", "MATH", "PHYS", "GOVM", "ECON")) %>%
+        filter(Department %in% c("Government", "Economics", "Computer Science", "Statistics", "Physics", "Mathematics")) %>%
         
         #This function then filters the data so only the selected year is shown.
         
-        filter(Year == input$year) %>%
+        filter(Year == fall_function(input$year)) %>%
         
         #Next, the plot begins.
         
@@ -394,6 +498,113 @@ server <- function(input, output) {
        
     })
   
+    
+    output$plot2.1 <- renderPlot({ 
+      
+      #Starting with the combined enrollment data set
+      
+      enrollment_spring %>%
+        
+        #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
+        
+        filter(Department %in% c("Government", "Economics", "Computer Science", "Statistics", "Physics", "Mathematics")) %>%
+        
+        #This function then filters the data so only the selected year is shown.
+        
+        filter(Year == spring_function(input$year)) %>%
+        
+        #Next, the plot begins.
+        
+        ggplot(aes(x = Department, 
+                   
+                   #The y axis marks the numbered of enrolled undergraduates
+                   
+                   y = Undergraduates, 
+                   
+                   #The color is by department
+                   
+                   fill = Department)) +
+        
+        #Choosing a boxplot is helpful for showing data distributions.
+        
+        geom_violin() + 
+        
+        #Then, the labels and titles are set.
+        
+        labs(title = "Departments Enrollment Distributions Fluctuate Slightly Over Years", 
+             caption = "Source: Harvard Registrar") +
+        
+        #Next, the y-axis is labeled.
+        
+        ylab("Density of Course Enrollment Size Frequency") +
+        
+        #Next, the x-axis is labeled.
+        
+        xlab(NULL) +
+        
+        #Next, scaling the y-axis is necessary so that there is not a huge right tail on each of the datasets to account for very large classes.
+        
+        scale_y_log10() + 
+        
+        #Next, the coordinates are flipped in order to make reading easier for the viewer
+        
+        coord_flip() + 
+        
+        #Next, the jitter is overlayed to demonstrate the density somehow
+        
+        geom_jitter()
+      
+    })
+    
+    output$plot3 <- renderPlot({ 
+      
+      #Starting with the combined enrollment data set
+      
+      enrollment_fall %>%
+        
+        #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
+        
+        filter(Department %in% c("Government", "Economics", "Computer Science", "Statistics", "Physics", "Mathematics")) %>%
+        
+        #This function then filters the data so only the selected year is shown.
+        
+        filter(Year == spring_function(input$year)) %>%
+        
+        #Next, it is important to group the courses by department for departmental comparisons
+      
+        ggplot(aes(x = Department, y = Graduates)) +
+        
+        #Choosing a boxplot is helpful for showing data distributions.
+        
+        geom_dotplot() + 
+        
+        #Then, the labels and titles are set.
+        
+        labs(title = "Departments Enrollment Distributions Fluctuate Slightly Over Years", 
+             caption = "Source: Harvard Registrar") +
+        
+        #Next, the y-axis is labeled.
+        
+        ylab("Density of Course Enrollment Size Frequency") +
+        
+        #Next, the x-axis is labeled.
+        
+        xlab(NULL) +
+        
+        #Next, scaling the y-axis is necessary so that there is not a huge right tail on each of the datasets to account for very large classes.
+        
+        scale_y_log10() + 
+        
+        #Next, the coordinates are flipped in order to make reading easier for the viewer
+        
+        coord_flip() + 
+        
+        #Next, the jitter is overlayed to demonstrate the density somehow
+        
+        geom_jitter()
+      
+    })
+    
 }
 
 # Run the application 
