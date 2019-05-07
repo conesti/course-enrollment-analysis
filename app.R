@@ -15,54 +15,64 @@ library(readxl)
 library(ggthemes)
 library(viridis)
 library(ggridges)
+library(plotly)
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
+ui <- navbarPage("Course Enrollment Analysis",
    
-   # Application title
-   titlePanel("Course Enrollment Analysis"),
-   
-   # Sidebar with a slider input for number of bins 
-   sidebarLayout(
-      sidebarPanel(
-         selectInput("year",
-                     "Select a Year",
-                     c("2018-2019", 
-                       "2017-2018", 
-                       "2016-2017", 
-                       "2015-2016"),
-                     selected = "2018-2019"
-         )
-      ),
-      
-      # Show a plot of the generated distribution
-      mainPanel(
-        
-        #In according with instructions and to add organization to the app, one has a panel with various tabs.
-        
-        tabsetPanel(type = "tabs",
+  
         
          #The first panel shows the largest classes.                        
                     
-         tabPanel("Largest Classes", plotOutput("plot1"), plotOutput("plot1.1")),
+         tabPanel("Largest Classes", 
+                  sidebarPanel(selectInput("year",
+                       "Select a Year",
+                       c("2018-2019", 
+                         "2017-2018", 
+                         "2016-2017", 
+                         "2015-2016"),
+                       selected = "2018-2019")
+           ), mainPanel(plotlyOutput("plot1"), plotlyOutput("plot1.1"))),
          
          #Next, one can observe distributions of how enrollment sizes across courses.
          
-         tabPanel("Distributions", plotOutput("plot2"), plotOutput("plot2.1")),
+         tabPanel("Distributions", sidebarPanel(selectInput("year",
+                                                            "Select a Year",
+                                                            c("2018-2019", 
+                                                              "2017-2018", 
+                                                              "2016-2017", 
+                                                              "2015-2016"),
+                                                            selected = "2018-2019")), 
+                                                mainPanel(plotlyOutput("plot2"), plotlyOutput("plot2.1"))),
          
          #The next panel will cover comparisons across departments.
          
-         tabPanel("Graduate vs. Undergraduate Enrollment", plotOutput("plot3")),
+         tabPanel("Graduate vs. Undergraduate Enrollment", sidebarPanel(selectInput("year",
+                                                                                    "Select a Year",
+                                                                                    c("2018-2019", 
+                                                                                      "2017-2018", 
+                                                                                      "2016-2017", 
+                                                                                      "2015-2016"),
+                                                                                    selected = "2018-2019"
+         ), selectInput("departments", "Departments", choices = c("Economics",
+                                                                 "Government",
+                                                                 "Computer Science",
+                                                                 "Statistics"), 
+                                                      selected = c("Economics",
+                                                                   "Government",
+                                                                   "Computer Science",
+                                                                   "Statistics"), 
+                                                      multiple = TRUE)), 
+         mainPanel(plotlyOutput("plot3"), plotlyOutput("plot3.1"))),
          
          #Then, there is a panel dedicated to explaining the project and providing 
          
-         tabPanel("About", "This project is meant to compare enrollment sizes among different courses in different departments.  
-                  Feel free to flip through the tabs to see the various representations of the data.  Some of the tabs are yet to come.  Feel free to check out the github repository at: https://github.com/conesti/fall-course-enrollment-analysis.  I can also be reached at chrisonesti@gmail.com.")
+         tabPanel("About", htmlOutput("about"))
          
          ) 
-      )
-   )
-)
+  
+  
+
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
@@ -350,14 +360,13 @@ server <- function(input, output) {
                                .id = "Year")
   
   
-  
   #One begins with the first plot.
- 
-  output$plot1 <- renderPlot({ 
+  
+  output$plot1 <- renderPlotly({ 
     
     #One begins with the original dataset
     
-    enrollment_fall %>% 
+    largest <- enrollment_fall %>% 
       
     #Then one filters the year by an inputted value that the user will be able to specify.  
       
@@ -369,7 +378,7 @@ server <- function(input, output) {
     
     #Then the top 8 courses are selected.    
       
-    slice(1:10) %>% 
+    slice(1:8) %>% 
     
     #Next, one begins the plot with courses on the x axis and the number of enrolled students on the y axis    
       
@@ -395,13 +404,14 @@ server <- function(input, output) {
       
       theme_minimal() 
     
+    ggplotly(largest) %>% config(displayModeBar = FALSE)
   })
   
-  output$plot1.1 <- renderPlot({ 
+  output$plot1.1 <- renderPlotly({ 
     
     #One begins with the original dataset
     
-    enrollment_spring %>% 
+    largest2 <- enrollment_spring %>% 
       
       #Then one filters the year by an inputted value that the user will be able to specify.  
       
@@ -413,7 +423,7 @@ server <- function(input, output) {
       
       #Then the top 8 courses are selected.    
       
-      slice(1:10) %>% 
+      slice(1:8) %>% 
       
       #Next, one begins the plot with courses on the x axis and the number of enrolled students on the y axis    
       
@@ -439,13 +449,15 @@ server <- function(input, output) {
       
       theme_minimal() 
     
+    ggplotly(largest2) %>% config(displayModeBar = FALSE)
+    
   })
       
-    output$plot2 <- renderPlot({ 
+    output$plot2 <- renderPlotly({ 
       
         #Starting with the combined enrollment data set
     
-        enrollment_fall %>%
+        distribution <- enrollment_fall %>%
         
         #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
         
@@ -494,16 +506,19 @@ server <- function(input, output) {
         
         #Next, the jitter is overlayed to demonstrate the density somehow
         
-        geom_jitter()
+        geom_jitter() + 
+        
+        theme_minimal()
        
+        ggplotly(distribution) %>% config(displayModeBar = FALSE)
     })
   
     
-    output$plot2.1 <- renderPlot({ 
+    output$plot2.1 <- renderPlotly({ 
       
       #Starting with the combined enrollment data set
       
-      enrollment_spring %>%
+      distribution2 <- enrollment_spring %>%
         
         #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
         
@@ -552,59 +567,98 @@ server <- function(input, output) {
         
         #Next, the jitter is overlayed to demonstrate the density somehow
         
-        geom_jitter()
+        geom_jitter() + 
+        
+        theme_minimal()
+      
+      ggplotly(distribution2) %>% 
+        config(displayModeBar = FALSE)
       
     })
     
-    output$plot3 <- renderPlot({ 
+    output$plot3 <- renderPlotly({ 
       
       #Starting with the combined enrollment data set
       
-      enrollment_fall %>%
+      fall_graduates <- enrollment_fall %>%
+        
+        filter(Graduates > 0) %>% 
         
         #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
         
-        filter(Department %in% c("Government", "Economics", "Computer Science", "Statistics", "Physics", "Mathematics")) %>%
+        filter(Department %in% input$departments) %>%
         
         #This function then filters the data so only the selected year is shown.
         
-        filter(Year == spring_function(input$year)) %>%
+        filter(Year == fall_function(input$year)) %>%
         
-        #Next, it is important to group the courses by department for departmental comparisons
+        #Next, one can begin the plot.
       
-        ggplot(aes(x = Department, y = Graduates)) +
+        ggplot(aes(x = Department, y = Graduates, fill = Department)) +
         
         #Choosing a boxplot is helpful for showing data distributions.
         
-        geom_dotplot() + 
+        geom_boxplot() +
         
-        #Then, the labels and titles are set.
+        scale_y_log10() +
         
-        labs(title = "Departments Enrollment Distributions Fluctuate Slightly Over Years", 
-             caption = "Source: Harvard Registrar") +
+        coord_flip() +
         
-        #Next, the y-axis is labeled.
+        theme_minimal()
         
-        ylab("Density of Course Enrollment Size Frequency") +
+      ggplotly(fall_graduates) %>% 
         
-        #Next, the x-axis is labeled.
+        config(displayModeBar = FALSE)
+      
+    
+    })
+    
+    
+    output$plot3.1 <- renderPlotly({ 
+      
+      #Starting with the combined enrollment data set
+      
+      spring_graduates <- enrollment_spring %>%
         
-        xlab(NULL) +
+        filter(Graduates > 0) %>% 
         
-        #Next, scaling the y-axis is necessary so that there is not a huge right tail on each of the datasets to account for very large classes.
+        #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
         
-        scale_y_log10() + 
+        filter(Department %in% input$departments) %>%
         
-        #Next, the coordinates are flipped in order to make reading easier for the viewer
+        #This function then filters the data so only the selected year is shown.
         
-        coord_flip() + 
+        filter(Year == fall_function(input$year)) %>%
         
-        #Next, the jitter is overlayed to demonstrate the density somehow
+        #Next, one can begin the plot.
         
-        geom_jitter()
+        ggplot(aes(x = Department, y = Graduates, fill = Department)) +
+        
+        #Choosing a boxplot is helpful for showing data distributions.
+        
+        geom_boxplot() +
+        
+        scale_y_log10() +
+        
+        coord_flip() +
+        
+        theme_minimal()
+      
+      ggplotly(spring_graduates) %>% config(displayModeBar = FALSE)
+      
       
     })
     
+    output$about <- renderText ({
+      "<style>
+h1 {color:red;}
+p {color:blue;}
+</style><h3 syle = colo>This project is meant to compare enrollment sizes among different courses in different departments.</h3>
+      <p>Feel free to flip through the tabs to see the various representations of the data.  Some of the tabs are yet to come.  Feel free to check out the github repository at: https://github.com/conesti/fall-course-enrollment-analysis.</p> 
+      <p>I can also be reached at chrisonesti@gmail.com.</p>"
+      
+    })
+   
 }
 
 # Run the application 
