@@ -36,18 +36,64 @@ ui <- navbarPage("Course Enrollment Analysis",
          
          #Next, one can observe distributions of how enrollment sizes across courses.
          
-         tabPanel("Distributions", sidebarPanel(selectInput("year",
+         tabPanel("Distributions", sidebarPanel(selectInput("distribution_year",
                                                             "Select a Year",
                                                             c("2018-2019", 
                                                               "2017-2018", 
                                                               "2016-2017", 
                                                               "2015-2016"),
-                                                            selected = "2018-2019")), 
+                                                            selected = "2018-2019"), selectInput("distribution_departments", "Departments", choices = c("Economics",
+                                                                                                                                            "Government",
+                                                                                                                                            "Computer Science",
+                                                                                                                                            "Statistics", 
+                                                                                                                                            "Mathematics",
+                                                                                                                                            "Applied Mathematics",
+                                                                                                                                            "Physics",
+                                                                                                                                            "Chemistry", 
+                                                                                                                                            "English",
+                                                                                                                                            "History", 
+                                                                                                                                            "History & Literature", 
+                                                                                                                                            "Comparative Literature",
+                                                                                                                                            "Engineering Sciences",
+                                                                                                                                            "African & African Amer Studies",
+                                                                                                                                            "Anthropology",
+                                                                                                                                            "Applied Computation",
+                                                                                                                                            "Applied Physics",
+                                                                                                                                            "Astronomy",
+                                                                                                                                            "Biomedical Engineering", 
+                                                                                                                                            "Chemical & Physical Biology",
+                                                                                                                                            "Chemistry & Chemical Biology",
+                                                                                                                                            "East Asian Langs & Civ",
+                                                                                                                                            "Expository Writing",
+                                                                                                                                            "Freshman Seminar",
+                                                                                                                                            "General Education",
+                                                                                                                                            "Germanic Languages & Lit",
+                                                                                                                                            "Global Health & Health Policy",
+                                                                                                                                            "History of Art and Architecture", 
+                                                                                                                                            "History of Science",
+                                                                                                                                            "Human Evolutionary Biolgoy",
+                                                                                                                                            "Linguistics",
+                                                                                                                                            "Molecular & Cellular Biology",
+                                                                                                                                            "Music", 
+                                                                                                                                            "Near Eastern Languages & Civ",
+                                                                                                                                            "Social Studies", 
+                                                                                                                                            "Sociology", 
+                                                                                                                                            "Romance Languages & Literatures",
+                                                                                                                                            "South Asian Studies", 
+                                                                                                                                            "Stem Cell & Regenerative Biol", 
+                                                                                                                                            "Theater, Dance & Media",
+                                                                                                                                            "Women, Gender & Sexuality"), 
+                                                                                                 multiple = TRUE, 
+                                                selected = c("Economics",
+                                                             "Government",
+                                                             "Computer Science",
+                                                             "Statistics"))),
+                                                          
                                                 mainPanel(plotlyOutput("plot2"), plotlyOutput("plot2.1"))),
          
          #The next panel will cover comparisons across departments.
          
-         tabPanel("Graduate vs. Undergraduate Enrollment", sidebarPanel(selectInput("year",
+         tabPanel("Graduate vs. Undergraduate Enrollment", sidebarPanel(selectInput("graduate_year",
                                                                                     "Select a Year",
                                                                                     c("2018-2019", 
                                                                                       "2017-2018", 
@@ -57,7 +103,45 @@ ui <- navbarPage("Course Enrollment Analysis",
          ), selectInput("departments", "Departments", choices = c("Economics",
                                                                  "Government",
                                                                  "Computer Science",
-                                                                 "Statistics"), 
+                                                                 "Statistics", 
+                                                                 "Mathematics",
+                                                                 "Applied Mathematics",
+                                                                 "Physics",
+                                                                 "Chemistry", 
+                                                                 "English",
+                                                                 "History", 
+                                                                 "History & Literature", 
+                                                                 "Comparative Literature",
+                                                                 "Engineering Sciences",
+                                                                 "African & African Amer Studies",
+                                                                 "Anthropology",
+                                                                 "Applied Computation",
+                                                                 "Applied Physics",
+                                                                 "Astronomy",
+                                                                 "Biomedical Engineering", 
+                                                                 "Chemical & Physical Biology",
+                                                                 "Chemistry & Chemical Biology",
+                                                                 "East Asian Langs & Civ",
+                                                                 "Expository Writing",
+                                                                 "Freshman Seminar",
+                                                                 "General Education",
+                                                                 "Germanic Languages & Lit",
+                                                                 "Global Health & Health Policy",
+                                                                 "History of Art and Architecture", 
+                                                                 "History of Science",
+                                                                 "Human Evolutionary Biolgoy",
+                                                                 "Linguistics",
+                                                                 "Molecular & Cellular Biology",
+                                                                 "Music", 
+                                                                 "Near Eastern Languages & Civ",
+                                                                 "Social Studies", 
+                                                                 "Sociology", 
+                                                                 "Romance Languages & Literatures",
+                                                                 "South Asian Studies", 
+                                                                 "Stem Cell & Regenerative Biol", 
+                                                                 "Theater, Dance & Media",
+                                                                 "Women, Gender & Sexuality"
+                                                                 ), 
                                                       selected = c("Economics",
                                                                    "Government",
                                                                    "Computer Science",
@@ -461,11 +545,11 @@ server <- function(input, output) {
         
         #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
         
-        filter(Department %in% c("Government", "Economics", "Computer Science", "Statistics", "Physics", "Mathematics")) %>%
+        filter(Department %in% input$distribution_departments) %>%
         
         #This function then filters the data so only the selected year is shown.
         
-        filter(Year == fall_function(input$year)) %>%
+        filter(Year == fall_function(input$distribution_year)) %>%
         
         #Next, the plot begins.
         
@@ -506,7 +590,7 @@ server <- function(input, output) {
         
         #Next, the jitter is overlayed to demonstrate the density somehow
         
-        geom_jitter() + 
+        geom_jitter(width = .3) + 
         
         theme_minimal()
        
@@ -522,11 +606,11 @@ server <- function(input, output) {
         
         #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
         
-        filter(Department %in% c("Government", "Economics", "Computer Science", "Statistics", "Physics", "Mathematics")) %>%
+        filter(Department %in% input$distribution_departments) %>%
         
         #This function then filters the data so only the selected year is shown.
         
-        filter(Year == spring_function(input$year)) %>%
+        filter(Year == spring_function(input$distribution_year)) %>%
         
         #Next, the plot begins.
         
@@ -567,7 +651,7 @@ server <- function(input, output) {
         
         #Next, the jitter is overlayed to demonstrate the density somehow
         
-        geom_jitter() + 
+        geom_jitter(width = .3, aes(text = sprintf(Title))) + 
         
         theme_minimal()
       
@@ -590,7 +674,7 @@ server <- function(input, output) {
         
         #This function then filters the data so only the selected year is shown.
         
-        filter(Year == fall_function(input$year)) %>%
+        filter(Year == fall_function(input$graduate_year)) %>%
         
         #Next, one can begin the plot.
       
@@ -606,7 +690,7 @@ server <- function(input, output) {
         
         theme_minimal()
         
-      ggplotly(fall_graduates) %>% 
+      ggplotly(fall_graduates, dynamicTicks = TRUE, hoverinfo = "none") %>% 
         
         config(displayModeBar = FALSE)
       
@@ -628,7 +712,7 @@ server <- function(input, output) {
         
         #This function then filters the data so only the selected year is shown.
         
-        filter(Year == fall_function(input$year)) %>%
+        filter(Year == fall_function(input$graduate_year)) %>%
         
         #Next, one can begin the plot.
         
