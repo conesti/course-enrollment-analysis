@@ -31,8 +31,9 @@ ui <- navbarPage("Course Enrollment Analysis",
                          "2017-2018", 
                          "2016-2017", 
                          "2015-2016"),
-                       selected = "2018-2019")
-           ), mainPanel(plotlyOutput("plot1"), plotlyOutput("plot1.1"))),
+                       selected = "2018-2019"),
+                       width = 2
+           ), mainPanel(width = 10, plotlyOutput("fall_largest"), htmlOutput("space"), plotlyOutput("spring_largest"))),
          
          #Next, one can observe distributions of how enrollment sizes across courses.
          
@@ -87,9 +88,9 @@ ui <- navbarPage("Course Enrollment Analysis",
                                                 selected = c("Economics",
                                                              "Government",
                                                              "Computer Science",
-                                                             "Statistics"))),
+                                                             "Statistics")), width = 2),
                                                           
-                                                mainPanel(plotlyOutput("plot2"), plotlyOutput("plot2.1"))),
+                                                mainPanel(width = 10, plotlyOutput("fall_distributions"), plotlyOutput("spring_distributions"))),
          
          #The next panel will cover comparisons across departments.
          
@@ -146,8 +147,61 @@ ui <- navbarPage("Course Enrollment Analysis",
                                                                    "Government",
                                                                    "Computer Science",
                                                                    "Statistics"), 
-                                                      multiple = TRUE)), 
-         mainPanel(plotlyOutput("plot3"), plotlyOutput("plot3.1"))),
+                                                      multiple = TRUE), width = 2), 
+         mainPanel(width = 10, plotlyOutput("fall_graduates"), plotlyOutput("spring_graduates"))),
+         
+         
+         
+         tabPanel("Enrollment Time Graph", sidebarPanel(selectInput("timegraph_departments", "Department", choices = c("Economics",
+                                                                  "Government",
+                                                                  "Computer Science",
+                                                                  "Statistics", 
+                                                                  "Mathematics",
+                                                                  "Applied Mathematics",
+                                                                  "Physics",
+                                                                  "Chemistry", 
+                                                                  "English",
+                                                                  "History", 
+                                                                  "History & Literature", 
+                                                                  "Comparative Literature",
+                                                                  "Engineering Sciences",
+                                                                  "African & African Amer Studies",
+                                                                  "Anthropology",
+                                                                  "Applied Computation",
+                                                                  "Applied Physics",
+                                                                  "Astronomy",
+                                                                  "Biomedical Engineering", 
+                                                                  "Chemical & Physical Biology",
+                                                                  "Chemistry & Chemical Biology",
+                                                                  "East Asian Langs & Civ",
+                                                                  "Expository Writing",
+                                                                  "Freshman Seminar",
+                                                                  "General Education",
+                                                                  "Germanic Languages & Lit",
+                                                                  "Global Health & Health Policy",
+                                                                  "History of Art and Architecture", 
+                                                                  "History of Science",
+                                                                  "Human Evolutionary Biolgoy",
+                                                                  "Linguistics",
+                                                                  "Molecular & Cellular Biology",
+                                                                  "Music", 
+                                                                  "Near Eastern Languages & Civ",
+                                                                  "Social Studies", 
+                                                                  "Sociology", 
+                                                                  "Romance Languages & Literatures",
+                                                                  "South Asian Studies", 
+                                                                  "Stem Cell & Regenerative Biol", 
+                                                                  "Theater, Dance & Media",
+                                                                  "Women, Gender & Sexuality"
+         ), 
+         selected = c("Economics",
+                      "Government",
+                      "Computer Science",
+                      "Statistics"), 
+         multiple = TRUE), width = 2), 
+         mainPanel(width = 10, plotlyOutput("spring_timegraph"), plotlyOutput("fall_timegraph"))),
+         
+         
          
          #Then, there is a panel dedicated to explaining the project and providing 
          
@@ -446,11 +500,11 @@ server <- function(input, output) {
   
   #One begins with the first plot.
   
-  output$plot1 <- renderPlotly({ 
+  output$fall_largest <- renderPlotly({ 
     
     #One begins with the original dataset
     
-    largest <- enrollment_fall %>% 
+    fall_largest <- enrollment_fall %>% 
       
     #Then one filters the year by an inputted value that the user will be able to specify.  
       
@@ -462,7 +516,7 @@ server <- function(input, output) {
     
     #Then the top 8 courses are selected.    
       
-    slice(1:8) %>% 
+    slice(1:10) %>% 
     
     #Next, one begins the plot with courses on the x axis and the number of enrolled students on the y axis    
       
@@ -474,7 +528,7 @@ server <- function(input, output) {
       
       #The title is named so that the user can understand what the chart is about.
       
-      labs(title = "Total Enrollment by Class in Selected Year", caption = "Source: Harvard Registrar") +
+      labs(title = "Largest Fall Classes in Selected Year", caption = "Source: Harvard Registrar") +
       
       #Next, the axis is labeled clearly.
       
@@ -488,14 +542,14 @@ server <- function(input, output) {
       
       theme_minimal() 
     
-    ggplotly(largest) %>% config(displayModeBar = FALSE)
+    ggplotly(fall_largest) %>% config(displayModeBar = FALSE)
   })
   
-  output$plot1.1 <- renderPlotly({ 
+  output$spring_largest <- renderPlotly({ 
     
     #One begins with the original dataset
     
-    largest2 <- enrollment_spring %>% 
+    spring_largest <- enrollment_spring %>% 
       
       #Then one filters the year by an inputted value that the user will be able to specify.  
       
@@ -507,7 +561,7 @@ server <- function(input, output) {
       
       #Then the top 8 courses are selected.    
       
-      slice(1:8) %>% 
+      slice(1:10) %>% 
       
       #Next, one begins the plot with courses on the x axis and the number of enrolled students on the y axis    
       
@@ -519,7 +573,7 @@ server <- function(input, output) {
       
       #The title is named so that the user can understand what the chart is about.
       
-      labs(title = "Total Enrollment by Class in Selected Year", caption = "Source: Harvard Registrar") +
+      labs(title = "Largest Spring Courses in Selected Year", caption = "Source: Harvard Registrar") +
       
       #Next, the axis is labeled clearly.
       
@@ -533,15 +587,15 @@ server <- function(input, output) {
       
       theme_minimal() 
     
-    ggplotly(largest2) %>% config(displayModeBar = FALSE)
+    ggplotly(spring_largest) %>% config(displayModeBar = FALSE)
     
   })
       
-    output$plot2 <- renderPlotly({ 
+    output$fall_distributions <- renderPlotly({ 
       
         #Starting with the combined enrollment data set
     
-        distribution <- enrollment_fall %>%
+        fall_distributions <- enrollment_fall %>%
         
         #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
         
@@ -569,7 +623,7 @@ server <- function(input, output) {
         
         #Then, the labels and titles are set.
         
-        labs(title = "Departments Enrollment Distributions Fluctuate Slightly Over Years", 
+        labs(title = "Distribution of Fall Course Sizes by Department in Selected Year", 
              caption = "Source: Harvard Registrar") +
         
         #Next, the y-axis is labeled.
@@ -594,15 +648,15 @@ server <- function(input, output) {
         
         theme_minimal()
        
-        ggplotly(distribution) %>% config(displayModeBar = FALSE)
+        ggplotly(fall_distributions) %>% config(displayModeBar = FALSE)
     })
   
     
-    output$plot2.1 <- renderPlotly({ 
+    output$spring_distributions <- renderPlotly({ 
       
       #Starting with the combined enrollment data set
       
-      distribution2 <- enrollment_spring %>%
+      spring_distributions <- enrollment_spring %>%
         
         #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
         
@@ -630,12 +684,12 @@ server <- function(input, output) {
         
         #Then, the labels and titles are set.
         
-        labs(title = "Departments Enrollment Distributions Fluctuate Slightly Over Years", 
+        labs(title = "Distribution of Spring Course Sizes by Department in Selected Year", 
              caption = "Source: Harvard Registrar") +
         
         #Next, the y-axis is labeled.
         
-        ylab("Density of Course Enrollment Size Frequency") +
+        ylab("Course Undergraduate Enrollment") +
         
         #Next, the x-axis is labeled.
         
@@ -660,7 +714,7 @@ server <- function(input, output) {
       
     })
     
-    output$plot3 <- renderPlotly({ 
+    output$fall_graduates <- renderPlotly({ 
       
       #Starting with the combined enrollment data set
       
@@ -682,7 +736,16 @@ server <- function(input, output) {
         
         #Choosing a boxplot is helpful for showing data distributions.
         
-        geom_boxplot() +
+        geom_violin() +
+        
+        labs(title = "Distribution of Spring Course Sizes by Department in Selected Year", 
+             caption = "Source: Harvard Registrar") +
+        
+        #Next, the y-axis is labeled.
+        
+        ylab("Course Undergraduate Enrollment") +
+        
+        geom_jitter(width = .3, aes(text = sprintf(Title))) +
         
         scale_y_log10() +
         
@@ -690,7 +753,7 @@ server <- function(input, output) {
         
         theme_minimal()
         
-      ggplotly(fall_graduates, dynamicTicks = TRUE, hoverinfo = "none") %>% 
+      ggplotly(fall_graduates) %>% 
         
         config(displayModeBar = FALSE)
       
@@ -698,7 +761,7 @@ server <- function(input, output) {
     })
     
     
-    output$plot3.1 <- renderPlotly({ 
+    output$spring_graduates <- renderPlotly({ 
       
       #Starting with the combined enrollment data set
       
@@ -720,7 +783,16 @@ server <- function(input, output) {
         
         #Choosing a boxplot is helpful for showing data distributions.
         
-        geom_boxplot() +
+        geom_violin() +
+        
+        geom_jitter(width = .3, aes(text = sprintf(Title))) +
+        
+        labs(title = "Distribution of Spring Course Sizes by Department in Selected Year", 
+             caption = "Source: Harvard Registrar") +
+        
+        #Next, the y-axis is labeled.
+        
+        ylab("Course Undergraduate Enrollment") +
         
         scale_y_log10() +
         
@@ -735,14 +807,95 @@ server <- function(input, output) {
     
     output$about <- renderText ({
       "<style>
-h1 {color:red;}
-p {color:blue;}
-</style><h3 syle = colo>This project is meant to compare enrollment sizes among different courses in different departments.</h3>
+        p {color:blue;}
+      </style>
+      <h3 syle = colo>This project is meant to compare enrollment sizes among different courses in different departments.</h3>
       <p>Feel free to flip through the tabs to see the various representations of the data.  Some of the tabs are yet to come.  Feel free to check out the github repository at: https://github.com/conesti/fall-course-enrollment-analysis.</p> 
       <p>I can also be reached at chrisonesti@gmail.com.</p>"
       
     })
    
+    
+    output$spring_timegraph <- renderPlotly({ 
+      
+      #Starting with the combined enrollment data set
+      
+      spring_timegraph <- enrollment_spring %>%
+        
+        #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
+        
+        filter(Department %in% input$timegraph_departments) %>%
+        
+        #Grouping by year and Department allows one to get specific data for each department over time
+        
+        group_by(Year, Department) %>%
+        
+        #Next, the number of undergraduate enrollments are summed
+        
+        summarize(Total = sum(Undergraduates)) %>%
+        
+        #Next, one can begin the plot.
+        
+        ggplot(aes(x = Year, y = Total, fill = Department)) +
+        
+        #Choosing a boxplot is helpful for showing data distributions.
+        
+        geom_line(aes(group = 1, color = Department)) +
+        
+        geom_point(aes(color = Department)) +
+        
+        theme_minimal() + 
+        
+        ylab("Total Enrollments in Department Courses")
+      
+      ggplotly(spring_timegraph) %>% 
+        config(displayModeBar = FALSE)
+      
+      
+    })
+    
+    output$fall_timegraph <- renderPlotly({ 
+      
+      #Starting with the combined enrollment data set
+      
+      fall_timegraph <- enrollment_fall %>%
+        
+        #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
+        
+        filter(Department %in% input$timegraph_departments) %>%
+        
+        #This function then filters the data so only the selected year is shown.
+        
+        group_by(Year, Department) %>%
+        
+        summarize(Total = sum(Undergraduates)) %>%
+        
+        #Next, one can begin the plot.
+        
+        ggplot(aes(x = Year, y = Total, fill = Department)) +
+        
+        #Choosing a boxplot is helpful for showing data distributions.
+        
+        geom_line(aes(group = 1, color = Department)) +
+        
+        geom_point(aes(color = Department)) +
+        
+        theme_minimal() + 
+        
+        ylab("Total Enrollments in Department Courses")
+      
+      ggplotly(fall_timegraph) %>% 
+        config(displayModeBar = FALSE)
+      
+      
+    })
+    
+    output$space <- renderText ({
+      "<br>
+      <br>"
+      
+    })
+
 }
 
 # Run the application 
