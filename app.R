@@ -26,11 +26,11 @@ ui <- navbarPage("Course Enrollment Analysis",
         
         tabPanel("Enrollment Time Graph", 
                  
-                 
+                 #The sidebar panel is a place to customize the data and filter it.
                  
                  sidebarPanel(
                    
-                   
+                   #The departments input is necessary to only show data from selected departments.
                    
                    selectInput("timegraph_departments", "Department", choices = c("Economics",
                                                                                                                        "Government",
@@ -73,7 +73,7 @@ ui <- navbarPage("Course Enrollment Analysis",
                                                                                                                        "Theater, Dance & Media",
                                                                                                                        "Women, Gender & Sexuality"), selected = c("Economics", "Government", "Computer Science", "Statistics"),  multiple = TRUE), width = 2), 
                  
-                 
+                 #The main panel shows the graphs or rendered html text that corresponds to the opened tab.
                  
                  mainPanel(width = 10, htmlOutput("timegraph_header"), plotlyOutput("fall_timegraph"), htmlOutput("space4"), plotlyOutput("spring_timegraph"))), 
         
@@ -81,15 +81,15 @@ ui <- navbarPage("Course Enrollment Analysis",
         
         tabPanel("Largest Classes", 
                  
-                 
+                 #The sidebar panel is a place to customize the data and filter it.
                  
                   sidebarPanel(
                     
-                    
+                    #Next, the input for the year allows the user to select which year the chart corresponds to.
                     
                     selectInput("year", "Select a Year", c("2018-2019", "2017-2018", "2016-2017", "2015-2016"), selected = "2018-2019"), width = 2), 
                  
-                 
+                  #The main panel shows the graphs or rendered html text that corresponds to the opened tab.
                  
                   mainPanel(width = 10, htmlOutput("largest_header"), plotlyOutput("fall_largest"), htmlOutput("space"), plotlyOutput("spring_largest"))),
            
@@ -97,15 +97,15 @@ ui <- navbarPage("Course Enrollment Analysis",
            
         tabPanel("Distributions", 
                  
-                 
+                 #The sidebar panel is a place to customize the data and filter it.
                  
                   sidebarPanel(
                     
-                    
+                    #Next, the input for the year allows the user to select which year the chart corresponds to.
                     
                     selectInput("distribution_year", "Select a Year", c("2018-2019", "2017-2018", "2016-2017", "2015-2016"), selected = "2018-2019"), 
                     
-                    
+                    #The departments input is necessary to only show data from selected departments.
                     
                     selectInput("distribution_departments", "Departments", choices = c("Economics",
                                                                                                                                                           "Government",
@@ -148,22 +148,23 @@ ui <- navbarPage("Course Enrollment Analysis",
                                                                                                                                                           "Theater, Dance & Media",
                                                                                                                                                           "Women, Gender & Sexuality"), multiple = TRUE, selected = c("Economics", "Government", "Computer Science", "Statistics")), width = 2),
                  
-                 
+                  #The main panel shows the graphs or rendered html text that corresponds to the opened tab.
                  
                   mainPanel(width = 10, htmlOutput("distributions_header"), plotlyOutput("fall_distributions"), htmlOutput("space2"), plotlyOutput("spring_distributions"))),
                    
-         #The next panel will cover comparisons across departments.
+        #The next panel covers the distribution of graduate students across undergraduate courses in each department.
          
         tabPanel("Graduate vs. Undergraduate Enrollment", 
                  
+                  #The sidebar panel is a place to customize the data and filter it.
                  
                   sidebarPanel(
                     
-                    
+                    #Next, the input for the year allows the user to select which year the chart corresponds to.
                     
                     selectInput("graduate_year", "Select a Year", c("2018-2019", "2017-2018", "2016-2017", "2015-2016"), selected = "2018-2019"), 
                     
-                    
+                    #The departments input is necessary to only show data from selected departments.
                     
                     selectInput("departments", "Departments", choices = c("Economics",
                                                                   "Government",
@@ -209,17 +210,15 @@ ui <- navbarPage("Course Enrollment Analysis",
                                                                    "Computer Science",
                                                                    "Statistics"), multiple = TRUE), width = 2), 
                  
-                 
+                  #The main panel shows the graphs or rendered html text that corresponds to the opened tab.
                  
                   mainPanel(width = 10, htmlOutput("graduates_header"), plotlyOutput("fall_graduates"), htmlOutput("space3"), plotlyOutput("spring_graduates"))),
         
-        
-         
-         #Then, there is a panel dedicated to explaining the project and providing 
+        #Then, there is a panel dedicated to explaining the project and providing 
          
         tabPanel("About", htmlOutput("about"))
          
-         ) 
+                ) 
   
   
 
@@ -292,8 +291,7 @@ server <- function(input, output) {
   
   #The next step is to fulfill this same code execution with the other years so that the data can later be combined.
   
-  enrollment_seventeen_fall <- read_excel("fall_course_enrollment_analysis/fall_2017.xlsx", 
-                                     skip = 3) %>% 
+  enrollment_seventeen_fall <- read_excel("fall_course_enrollment_analysis/fall_2017.xlsx", skip = 3) %>% 
     
     #Then one is only interested in course entries, not totals.
     
@@ -363,7 +361,21 @@ server <- function(input, output) {
     
     #Next, one is only interested in this part of the data.
     
-    select(ID = `COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`,
+    select(ID = `COURSE ID`, 
+           
+           #The course title is standardized first.
+           
+           Title = `COURSE`, 
+           
+           #Next the department label is standardized.
+           
+           Department = `DEPARTMENT`, 
+           
+           #The number of Harvard college students or undergraduates is labeled according to the standard.
+           
+           Undergraduates = `HCOL`,
+           
+           #The graduate count is also labeled.
            
            Graduates = `GSAS`)
   
@@ -400,7 +412,21 @@ server <- function(input, output) {
     
     #Next, one is only interested in this part of the data.
     
-    select(ID =`COURSE ID`, Title = `COURSE`, Department = `DEPARTMENT`, Undergraduates = `HCOL`,
+    select(ID =`COURSE ID`, 
+           
+           #The course titles are labeled.
+           
+           Title = `COURSE`, 
+           
+           #The departments are labeled as well.
+           
+           Department = `DEPARTMENT`, 
+           
+           #Next, the undergraduates counts are labeled
+           
+           Undergraduates = `HCOL`,
+           
+           #The graduate counts are labeled as well.
            
            Graduates = `GSAS`)
   
@@ -431,6 +457,8 @@ server <- function(input, output) {
            
            Undergraduates = `UGrad`,
            
+           #The graduates are also labeled.
+           
            Graduates = `Grad`)
   
   
@@ -460,6 +488,8 @@ server <- function(input, output) {
            
            Undergraduates = `UGrad`,
            
+           #The graduates are also labeled.
+           
            Graduates = `Grad`)
   
   enrollment_nineteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2019.xlsx", skip = 3) %>% 
@@ -487,6 +517,8 @@ server <- function(input, output) {
            #The same for enrolled
            
            Undergraduates = `UGrad`,
+           
+           #The graduates are also labeled.
            
            Graduates = `Grad`)
   
@@ -552,13 +584,15 @@ server <- function(input, output) {
       
       ylab("Number of Enrolled Undergraduates") + 
       
-      #The minimal theme is applied for aesthetic purposes
+      #The minimal theme works well with the white background.
       
-      theme_minimal() 
+      theme_minimal()
+    
+    #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
     
     ggplotly(fall_largest) %>% 
       
-      
+      #Next, the plotly bar is disabled for aesthetic purposes.
       
       config(displayModeBar = FALSE)
     
@@ -604,11 +638,15 @@ server <- function(input, output) {
       
       #The minimal theme is applied for aesthetic purposes
       
-      theme_minimal() 
+      #The minimal theme works well with the white background.
+      
+      theme_minimal()
+    
+    #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
     
     ggplotly(spring_largest) %>% 
       
-      
+      #Next, the plotly bar is disabled for aesthetic purposes.
       
       config(displayModeBar = FALSE)
     
@@ -668,12 +706,16 @@ server <- function(input, output) {
         #Next, the jitter is overlayed to demonstrate the density somehow
         
         geom_jitter(width = .3) + 
+          
+        #The minimal theme works well with the white background.
         
         theme_minimal()
+        
+        #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
        
         ggplotly(fall_distributions) %>% 
           
-          
+          #Next, the plotly bar is disabled for aesthetic purposes.
           
           config(displayModeBar = FALSE)
         
@@ -734,11 +776,15 @@ server <- function(input, output) {
         
         geom_jitter(width = .3, aes(text = sprintf(Title))) + 
         
+        #The minimal theme works well with the white background.
+        
         theme_minimal()
+      
+      #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
       
       ggplotly(spring_distributions) %>% 
         
-        
+        #Next, the plotly bar is disabled for aesthetic purposes.
         
         config(displayModeBar = FALSE)
       
@@ -780,12 +826,17 @@ server <- function(input, output) {
         
         coord_flip() +
         
-        theme_minimal()
+        #The minimal theme works well with the white background.
         
+        theme_minimal()
+      
+      #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
+      
       ggplotly(fall_graduates) %>% 
         
+        #Next, the plotly bar is disabled for aesthetic purposes.
+        
         config(displayModeBar = FALSE)
-      
     
     })
     
@@ -826,11 +877,15 @@ server <- function(input, output) {
         
         coord_flip() +
         
+        #The minimal theme works well with the white background.
+        
         theme_minimal()
+      
+      #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
       
       ggplotly(spring_graduates) %>% 
         
-        
+        #Next, the plotly bar is disabled for aesthetic purposes.
         
         config(displayModeBar = FALSE)
       
@@ -871,14 +926,19 @@ server <- function(input, output) {
         
         geom_point(aes(color = Department)) +
         
-        theme_minimal() + 
+        ylab("Total Enrollments in Department Courses") +
+      
+        #The minimal theme works well with the white background.
         
-        ylab("Total Enrollments in Department Courses")
+        theme_minimal()
+      
+      #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
       
       ggplotly(fall_timegraph) %>% 
         
+        #Next, the plotly bar is disabled for aesthetic purposes.
+        
         config(displayModeBar = FALSE)
-      
       
     })
     
@@ -908,7 +968,7 @@ server <- function(input, output) {
         
         geom_line(aes(group = 1, color = Department)) +
       
-        
+        #Next, the points are placed to connect the lines.
         
         geom_point(aes(color = Department)) +
         
@@ -918,11 +978,15 @@ server <- function(input, output) {
         
         ylab("Density of Course Enrollment Size Frequency") +
         
-        theme_minimal() + 
+        #The minimal theme works well with the white background.
         
-        ylab("Total Enrollments in Department Courses")
+        theme_minimal()
+      
+      #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
       
       ggplotly(spring_timegraph) %>% 
+        
+        #Next, the plotly bar is disabled for aesthetic purposes.
         
         config(displayModeBar = FALSE)
       
@@ -969,6 +1033,8 @@ server <- function(input, output) {
       
     })
     
+    #This is the header for the Time Graph tab.
+    
     output$timegraph_header <- renderText ({
       
       "<h2 align = center> Course Enrollment Over Time</h2>
@@ -978,6 +1044,8 @@ server <- function(input, output) {
       
     })
     
+    #This is the header for the Largest Courses tab.
+    
     output$largest_header <- renderText ({
       
       "<h2 align = center> Largest Classes</h2>
@@ -986,6 +1054,8 @@ server <- function(input, output) {
       bar in the upper left corner or delete one that is currently there using the delete key.</p>"
       
     })
+    
+    #This is the header for the Distributions Tab.
     
     output$distributions_header <- renderText ({
       
@@ -997,6 +1067,8 @@ server <- function(input, output) {
       
     })
     
+    #This is the header for the Graduate vs. Undergraduate Enrollment tab.
+    
     output$graduates_header <- renderText ({
       
       "<h2 align = center> Graduate Students in Undergraduate Courses</h2>
@@ -1004,6 +1076,8 @@ server <- function(input, output) {
       bar in the upper left corner or delete one that is currently there using the delete key.</p>"
       
     })
+    
+    #This is the rendering of the About tab, which gives information about the Shiny app.
     
     output$about <- renderText ({
       
