@@ -23,7 +23,55 @@ ui <- navbarPage("Course Enrollment Analysis",
   
         
          #The first panel shows the largest classes.                        
-                    
+         tabPanel("Enrollment Time Graph", sidebarPanel(selectInput("timegraph_departments", "Department", choices = c("Economics",
+                                                                                                                       "Government",
+                                                                                                                       "Computer Science",
+                                                                                                                       "Statistics", 
+                                                                                                                       "Mathematics",
+                                                                                                                       "Applied Mathematics",
+                                                                                                                       "Physics",
+                                                                                                                       "Chemistry", 
+                                                                                                                       "English",
+                                                                                                                       "History", 
+                                                                                                                       "History & Literature", 
+                                                                                                                       "Comparative Literature",
+                                                                                                                       "Engineering Sciences",
+                                                                                                                       "African & African Amer Studies",
+                                                                                                                       "Anthropology",
+                                                                                                                       "Applied Computation",
+                                                                                                                       "Applied Physics",
+                                                                                                                       "Astronomy",
+                                                                                                                       "Biomedical Engineering", 
+                                                                                                                       "Chemical & Physical Biology",
+                                                                                                                       "Chemistry & Chemical Biology",
+                                                                                                                       "East Asian Langs & Civ",
+                                                                                                                       "Expository Writing",
+                                                                                                                       "Freshman Seminar",
+                                                                                                                       "General Education",
+                                                                                                                       "Germanic Languages & Lit",
+                                                                                                                       "Global Health & Health Policy",
+                                                                                                                       "History of Art and Architecture", 
+                                                                                                                       "History of Science",
+                                                                                                                       "Human Evolutionary Biolgoy",
+                                                                                                                       "Linguistics",
+                                                                                                                       "Molecular & Cellular Biology",
+                                                                                                                       "Music", 
+                                                                                                                       "Near Eastern Languages & Civ",
+                                                                                                                       "Social Studies", 
+                                                                                                                       "Sociology", 
+                                                                                                                       "Romance Languages & Literatures",
+                                                                                                                       "South Asian Studies", 
+                                                                                                                       "Stem Cell & Regenerative Biol", 
+                                                                                                                       "Theater, Dance & Media",
+                                                                                                                       "Women, Gender & Sexuality"
+         ), 
+         selected = c("Economics",
+                      "Government",
+                      "Computer Science",
+                      "Statistics"), 
+         multiple = TRUE), width = 2), 
+         mainPanel(width = 10, htmlOutput("timegraph_header"), plotlyOutput("spring_timegraph"), htmlOutput("space4"), plotlyOutput("fall_timegraph"))), 
+         
          tabPanel("Largest Classes", 
                   sidebarPanel(selectInput("year",
                        "Select a Year",
@@ -33,7 +81,7 @@ ui <- navbarPage("Course Enrollment Analysis",
                          "2015-2016"),
                        selected = "2018-2019"),
                        width = 2
-           ), mainPanel(width = 10, plotlyOutput("fall_largest"), htmlOutput("space"), plotlyOutput("spring_largest"))),
+           ), mainPanel(width = 10, htmlOutput("largest_header"), plotlyOutput("fall_largest"), htmlOutput("space"), plotlyOutput("spring_largest"))),
          
          #Next, one can observe distributions of how enrollment sizes across courses.
          
@@ -46,37 +94,36 @@ ui <- navbarPage("Course Enrollment Analysis",
                                                             selected = "2018-2019"), selectInput("distribution_departments", "Departments", choices = c("Economics",
                                                                                                                                             "Government",
                                                                                                                                             "Computer Science",
-                                                                                                                                            "Statistics", 
-                                                                                                                                            "Mathematics",
-                                                                                                                                            "Applied Mathematics",
-                                                                                                                                            "Physics",
-                                                                                                                                            "Chemistry", 
-                                                                                                                                            "English",
-                                                                                                                                            "History", 
-                                                                                                                                            "History & Literature", 
+                                                                                                                                            "Statistics",
                                                                                                                                             "Comparative Literature",
                                                                                                                                             "Engineering Sciences",
                                                                                                                                             "African & African Amer Studies",
                                                                                                                                             "Anthropology",
                                                                                                                                             "Applied Computation",
+                                                                                                                                            "Applied Mathematics",
                                                                                                                                             "Applied Physics",
                                                                                                                                             "Astronomy",
                                                                                                                                             "Biomedical Engineering", 
                                                                                                                                             "Chemical & Physical Biology",
                                                                                                                                             "Chemistry & Chemical Biology",
                                                                                                                                             "East Asian Langs & Civ",
+                                                                                                                                            "English",
                                                                                                                                             "Expository Writing",
                                                                                                                                             "Freshman Seminar",
                                                                                                                                             "General Education",
                                                                                                                                             "Germanic Languages & Lit",
                                                                                                                                             "Global Health & Health Policy",
+                                                                                                                                            "History", 
+                                                                                                                                            "History & Literature",
                                                                                                                                             "History of Art and Architecture", 
                                                                                                                                             "History of Science",
                                                                                                                                             "Human Evolutionary Biolgoy",
                                                                                                                                             "Linguistics",
+                                                                                                                                            "Mathematics",
                                                                                                                                             "Molecular & Cellular Biology",
                                                                                                                                             "Music", 
                                                                                                                                             "Near Eastern Languages & Civ",
+                                                                                                                                            "Physics",
                                                                                                                                             "Social Studies", 
                                                                                                                                             "Sociology", 
                                                                                                                                             "Romance Languages & Literatures",
@@ -90,7 +137,7 @@ ui <- navbarPage("Course Enrollment Analysis",
                                                              "Computer Science",
                                                              "Statistics")), width = 2),
                                                           
-                                                mainPanel(width = 10, plotlyOutput("fall_distributions"), plotlyOutput("spring_distributions"))),
+                                                mainPanel(width = 10, htmlOutput("distributions_header"), plotlyOutput("fall_distributions"), htmlOutput("space2"), plotlyOutput("spring_distributions"))),
          
          #The next panel will cover comparisons across departments.
          
@@ -148,58 +195,7 @@ ui <- navbarPage("Course Enrollment Analysis",
                                                                    "Computer Science",
                                                                    "Statistics"), 
                                                       multiple = TRUE), width = 2), 
-         mainPanel(width = 10, plotlyOutput("fall_graduates"), plotlyOutput("spring_graduates"))),
-         
-         
-         
-         tabPanel("Enrollment Time Graph", sidebarPanel(selectInput("timegraph_departments", "Department", choices = c("Economics",
-                                                                  "Government",
-                                                                  "Computer Science",
-                                                                  "Statistics", 
-                                                                  "Mathematics",
-                                                                  "Applied Mathematics",
-                                                                  "Physics",
-                                                                  "Chemistry", 
-                                                                  "English",
-                                                                  "History", 
-                                                                  "History & Literature", 
-                                                                  "Comparative Literature",
-                                                                  "Engineering Sciences",
-                                                                  "African & African Amer Studies",
-                                                                  "Anthropology",
-                                                                  "Applied Computation",
-                                                                  "Applied Physics",
-                                                                  "Astronomy",
-                                                                  "Biomedical Engineering", 
-                                                                  "Chemical & Physical Biology",
-                                                                  "Chemistry & Chemical Biology",
-                                                                  "East Asian Langs & Civ",
-                                                                  "Expository Writing",
-                                                                  "Freshman Seminar",
-                                                                  "General Education",
-                                                                  "Germanic Languages & Lit",
-                                                                  "Global Health & Health Policy",
-                                                                  "History of Art and Architecture", 
-                                                                  "History of Science",
-                                                                  "Human Evolutionary Biolgoy",
-                                                                  "Linguistics",
-                                                                  "Molecular & Cellular Biology",
-                                                                  "Music", 
-                                                                  "Near Eastern Languages & Civ",
-                                                                  "Social Studies", 
-                                                                  "Sociology", 
-                                                                  "Romance Languages & Literatures",
-                                                                  "South Asian Studies", 
-                                                                  "Stem Cell & Regenerative Biol", 
-                                                                  "Theater, Dance & Media",
-                                                                  "Women, Gender & Sexuality"
-         ), 
-         selected = c("Economics",
-                      "Government",
-                      "Computer Science",
-                      "Statistics"), 
-         multiple = TRUE), width = 2), 
-         mainPanel(width = 10, plotlyOutput("spring_timegraph"), plotlyOutput("fall_timegraph"))),
+         mainPanel(width = 10, htmlOutput("graduates_header"), plotlyOutput("fall_graduates"), htmlOutput("space3"), plotlyOutput("spring_graduates"))),
          
          
          
@@ -371,7 +367,7 @@ server <- function(input, output) {
                           
                           #Then the id is set to year so that one retains which year each row refers to
                           
-                          .id = "Year")
+                          .id = "Year") %>% filter(Undergraduates > Graduates)
   
   
   enrollment_sixteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2016.xlsx", skip = 0) %>% 
@@ -448,8 +444,6 @@ server <- function(input, output) {
            
            Graduates = `Grad`)
   
-  
-  
   enrollment_nineteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2019.xlsx", skip = 3) %>% 
     
     #Then one is only interested in course entries, not totals.
@@ -495,7 +489,28 @@ server <- function(input, output) {
                                
                                #Then the id is set to year so that one retains which year each row refers to
                                
-                               .id = "Year")
+                               .id = "Year") %>% filter(Graduates < Undergraduates)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   #One begins with the first plot.
@@ -709,7 +724,7 @@ server <- function(input, output) {
         
         theme_minimal()
       
-      ggplotly(distribution2) %>% 
+      ggplotly(spring_distributions) %>% 
         config(displayModeBar = FALSE)
       
     })
@@ -738,7 +753,7 @@ server <- function(input, output) {
         
         geom_violin() +
         
-        labs(title = "Distribution of Spring Course Sizes by Department in Selected Year", 
+        labs(title = "Distribution of Undergraduate Spring Course Graduate Enrollments by Department in Selected Year", 
              caption = "Source: Harvard Registrar") +
         
         #Next, the y-axis is labeled.
@@ -787,7 +802,7 @@ server <- function(input, output) {
         
         geom_jitter(width = .3, aes(text = sprintf(Title))) +
         
-        labs(title = "Distribution of Spring Course Sizes by Department in Selected Year", 
+        labs(title = "Distribution of Undergraduate Spring Course Graduate Enrollments by Department in Selected Year", 
              caption = "Source: Harvard Registrar") +
         
         #Next, the y-axis is labeled.
@@ -805,16 +820,51 @@ server <- function(input, output) {
       
     })
     
-    output$about <- renderText ({
-      "<style>
-        p {color:blue;}
-      </style>
-      <h3 syle = colo>This project is meant to compare enrollment sizes among different courses in different departments.</h3>
-      <p>Feel free to flip through the tabs to see the various representations of the data.  Some of the tabs are yet to come.  Feel free to check out the github repository at: https://github.com/conesti/fall-course-enrollment-analysis.</p> 
-      <p>I can also be reached at chrisonesti@gmail.com.</p>"
+
+   
+    output$fall_timegraph <- renderPlotly({ 
+      
+      #Starting with the combined enrollment data set
+      
+      fall_timegraph <- enrollment_fall %>%
+        
+        #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
+        
+        filter(Department %in% input$timegraph_departments) %>%
+        
+        #This function then filters the data so only the selected year is shown.
+        
+        group_by(Year, Department) %>%
+        
+        summarize(Total = sum(Undergraduates)) %>%
+        
+        #Next, one can begin the plot.
+        
+        ggplot(aes(x = Year, y = Total, fill = Department)) +
+        
+        #Choosing a boxplot is helpful for showing data distributions.
+        
+        geom_line(aes(group = 1, color = Department)) +
+        
+        labs(title = "Total Enrollment in Fall Courses by Department Over Time", 
+             caption = "Source: Harvard Registrar") +
+        
+        #Next, the y-axis is labeled.
+        
+        ylab("Density of Course Enrollment Size Frequency") +
+        
+        geom_point(aes(color = Department)) +
+        
+        theme_minimal() + 
+        
+        ylab("Total Enrollments in Department Courses")
+      
+      ggplotly(fall_timegraph) %>% 
+        
+        config(displayModeBar = FALSE)
+      
       
     })
-   
     
     output$spring_timegraph <- renderPlotly({ 
       
@@ -844,58 +894,91 @@ server <- function(input, output) {
         
         geom_point(aes(color = Department)) +
         
+        labs(title = "Total Enrollment in Spring Courses by Department Over Time", 
+             caption = "Source: Harvard Registrar") +
+        
+        #Next, the y-axis is labeled.
+        
+        ylab("Density of Course Enrollment Size Frequency") +
+        
         theme_minimal() + 
         
         ylab("Total Enrollments in Department Courses")
       
       ggplotly(spring_timegraph) %>% 
+        
         config(displayModeBar = FALSE)
       
       
     })
     
-    output$fall_timegraph <- renderPlotly({ 
-      
-      #Starting with the combined enrollment data set
-      
-      fall_timegraph <- enrollment_fall %>%
-        
-        #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
-        
-        filter(Department %in% input$timegraph_departments) %>%
-        
-        #This function then filters the data so only the selected year is shown.
-        
-        group_by(Year, Department) %>%
-        
-        summarize(Total = sum(Undergraduates)) %>%
-        
-        #Next, one can begin the plot.
-        
-        ggplot(aes(x = Year, y = Total, fill = Department)) +
-        
-        #Choosing a boxplot is helpful for showing data distributions.
-        
-        geom_line(aes(group = 1, color = Department)) +
-        
-        geom_point(aes(color = Department)) +
-        
-        theme_minimal() + 
-        
-        ylab("Total Enrollments in Department Courses")
-      
-      ggplotly(fall_timegraph) %>% 
-        config(displayModeBar = FALSE)
-      
-      
-    })
+    
     
     output$space <- renderText ({
-      "<br>
-      <br>"
+      "<br><br><br>"
       
     })
-
+    
+    output$space2 <- renderText ({
+      "<br><br><br>"
+      
+    })
+    
+    output$space3 <- renderText ({
+      "<br><br><br>"
+      
+    })
+    
+    output$space4 <- renderText ({
+      "<br><br><br>"
+      
+    })
+    
+    output$timegraph_header <- renderText ({
+      "<h2 align = center> Course Enrollment Over Time</h2>
+      <p align = center style = 'margin-left:20%; margin-right: 20%'>The following graphs display the total number of undergraduate enrollments across all courses in a department 
+      for each school year.  To change the departments that are displayed, simply type the name of a new one into the 
+      bar in the upper left corner or delete one that is currently there using the delete key.</p>"
+      
+    })
+    
+    output$largest_header <- renderText ({
+      "<h2 align = center> Largest Classes</h2>
+      <p align = center style = 'margin-left:20%; margin-right: 20%'>The following graphs display the largest classes
+      for each school year.  To change the year, simply type the name of a new one into the 
+      bar in the upper left corner or delete one that is currently there using the delete key.</p>"
+      
+    })
+    
+    output$distributions_header <- renderText ({
+      "<h2 align = center> Class Size Distributions</h2>
+      <p align = center style = 'margin-left:20%; margin-right: 20%'>The following graphs display the distribution of class sizes within selected departments
+      for each school year.  To change the departments that are displayed, simply type the name of a new one into the 
+      bar in the upper left corner or delete one that is currently there using the delete key.  
+      You can also use the drop-down toggle to change the year</p>"
+      
+    })
+    
+    output$graduates_header <- renderText ({
+      "<h2 align = center> Graduate Students in Undergraduate Courses</h2>
+      <p align = center style = 'margin-left:20%; margin-right: 20%'>The following graphs display the distribution of the number of graduate students in undergraduate courses for each school year.  An undergraduate course is defined as a course with at least 3 undergraduate students and that contains a majority of undergraduate students.  To change the departments that are displayed, simply type the name of a new one into the 
+      bar in the upper left corner or delete one that is currently there using the delete key.</p>"
+      
+    })
+    
+    output$about <- renderText ({
+      
+      "<h1 align = center> Welcome to the Enrollment Project!</h1>
+      <p align = center style = 'margin-left:20%; margin-right: 20%'>Ever wonder what the major trends are in course enrollment?  
+      Using a public dataset on the Harvard Registrar, this Shiny app lets users visualize various presentations of the data from different angles.  
+      Each tab demonstrates a different segment of the data and there is a customizable interactive form on the top left of every page for the user to filter the data how they see fit.  
+      Feel free to browse through!</p>
+      <h4 align = center>Contact and Info</h4>
+      <p align = center>Email: chrisonesti@college.harvard.edu
+      <p align = center>GitHub Link: <a href = https://github.com/conesti/fall-course-enrollment-analysis>https://github.com/conesti/fall-course-enrollment-analysis</a>"
+      
+    })
+    
 }
 
 # Run the application 
