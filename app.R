@@ -223,39 +223,93 @@ ui <- navbarPage("Course Enrollment Analysis",
   
 
 
-# Define server logic required to draw a histogram
+# This function defines the server logic required to draw the graphs
+
 server <- function(input, output) {
   
+  #The spring function will take in a string with two years (both years of each school year) and output just the one that corresponds to the spring (the second of the two years).
+  
   spring_function <- function(x) {
+    
+    #This line checks for a given school year.
+    
     if (x == "2015-2016") {
+      
+      #Then, the second of the two years is returned.
+      
       "2016"
     }
+    
+    #This line checks for another given school year.
+    
     else if (x == "2016-2017") {
+      
+      #Then, the second of the two years is returned.
+      
       "2017"
     }
+    
+    #This line checks for another given school year.
+    
     else if (x == "2017-2018") {
+      
+      #Then, the second of the two years is returned.
+      
       "2018"
     }
+    
+    #Otherwise, it must be referring to the most recent school year due to limited selections.
+    
     else {
+      
+      #Then, the second of the two years is returned.
+      
       "2019"
     }
   }
   
+  #The fall function will take in a string with two years (both years of each school year) and output just the one that corresponds to the spring (the first of the two years).
+  
   fall_function <- function(x) {
+    
+    #This line checks for another given school year.
+    
     if (x == "2015-2016") {
+      
+      #Then, the first of the two years is returned.
+      
       "2015"
     }
+    
+    #This line checks for another given school year.
+    
     else if (x == "2016-2017") {
+      
+      #Then, the first of the two years is returned.
+      
       "2016"
     }
+    
+    #This line checks for another given school year.
+    
     else if (x == "2017-2018") {
+      
+      #Then, the first of the two years is returned.
+      
       "2017"
     }
+    
+    #Otherwise, it must be referring to the most recent school year due to limited selections.
+    
     else {
+      
+      #Then, the first of the two years is returned.
+      
       "2018"
     }
   }
   
+
   #The data is stored in an rds file contained within the repository so that the charts can update more quickly.
   #I decided to do this because I was experiencing slow update times.
   
@@ -276,7 +330,7 @@ server <- function(input, output) {
     
     fall_largest <- enrollment_fall %>% 
       
-    #Then one filters the year by an inputted value that the user will be able to specify.  
+    #Then one filters the year by an input value that the user will be able to specify.  
       
     filter(Year == fall_function(input$year)) %>% 
       
@@ -314,11 +368,39 @@ server <- function(input, output) {
     
     #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
     
-    ggplotly(fall_largest) %>% 
+    fl <- ggplotly(fall_largest) 
+    
+    #The following code is necessary to clean the hover text that displays in plotly
+    
+    #This code loops through the data structure containing the labels for each department
+    
+    for (j in 1:length(fl$x$data)) {
+      
+      #Within each department, the labels are looped through
+      
+      for (i in 1:length(fl$x$data[[j]]$text)) {
+        
+        #Each label is replaced with blank because they are not necessary for this bar graph.
+        
+        fl$x$data[[j]]$text[[i]] <- ""
+      }
+    }
+    
+    #Next, one displays the newly made plotly graph.
+    
+    fl %>% 
       
       #Next, the plotly bar is disabled for aesthetic purposes.
       
-      config(displayModeBar = FALSE)
+      config(displayModeBar = FALSE) %>% 
+      
+      #The x axis is disabled so there is no zooming, which is distracting.
+      
+      layout(xaxis = list(fixedrange=TRUE)) %>% 
+      
+      #The y axis is also disabled so there is no zooming, which is distracting.
+      
+      layout(yaxis = list(fixedrange=TRUE))
     
   })
   
@@ -366,11 +448,39 @@ server <- function(input, output) {
     
     #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
     
-    ggplotly(spring_largest) %>% 
+    sl <- ggplotly(spring_largest) 
+    
+    #The following code is necessary to clean the hover text that displays in plotly
+    
+    #This code loops through the data structure containing the labels for each department
+    
+    for (j in 1:length(sl$x$data)) {
+      
+      #Within each department, the labels are looped through
+      
+      for (i in 1:length(sl$x$data[[j]]$text)) {
+        
+        #Each label is replaced with a subset of the original label so there are no redundancies.
+        
+        sl$x$data[[j]]$text[[i]] <- ""
+      }
+    }
+    
+    #Next, one displays the newly made plotly graph.
+    
+    sl %>% 
       
       #Next, the plotly bar is disabled for aesthetic purposes.
       
-      config(displayModeBar = FALSE)
+      config(displayModeBar = FALSE) %>% 
+      
+      #The x axis is disabled so there is no zooming, which is distracting.
+      
+      layout(xaxis = list(fixedrange=TRUE)) %>% 
+      
+      #The y axis is also disabled so there is no zooming, which is distracting.
+      
+      layout(yaxis = list(fixedrange=TRUE))
     
     
   })
@@ -401,7 +511,7 @@ server <- function(input, output) {
                    
                    fill = Department)) +
         
-        #Choosing a boxplot is helpful for showing data distributions.
+        #Choosing a violin is helpful for showing data distributions.
         
         geom_violin() + 
         
@@ -427,19 +537,63 @@ server <- function(input, output) {
         
         #Next, the jitter is overlayed to demonstrate the density somehow
         
-        geom_jitter(width = .3, aes(text = Title)) + 
+        geom_jitter(width = .3, aes(text = paste("Course:", Title, "<br>",
+                                                 
+                                                 #The departments are good to have for convenience.
+                                                 
+                                                 "Department: ", Department, "<br>",
+                                                 
+                                                 #Next, the undergraduate enrollments are the key piece of data.
+                                                 
+                                                 "Undergraduates: ", Undergraduates, "<br>",
+                                                 
+                                                 #The graduate enrollment is good for extra information.
+                                                 
+                                                 "Graduates: ", Graduates))) + 
           
         #The minimal theme works well with the white background.
         
-        theme_minimal()
+        theme_minimal() + 
+          
+          #The legend is unnecessary in this case because the data categories are clearly labeled with axis marks
+          
+          theme(legend.position = "none")
         
         #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
        
-        ggplotly(fall_distributions) %>% 
+        fd <- ggplotly(fall_distributions)
+        
+        #The following code is necessary to clean the hover text that displays in plotly
+        
+        #This code loops through the data structure containing the labels for each department
+        
+        for (j in 1:length(fd$x$data)) {
+          
+          #Within each department, the labels are looped through
+          
+          for (i in 1:length(fd$x$data[[j]]$text)) {
+            
+            #Each label is replaced with a subset of the original label so there are no redundancies.
+            
+            fd$x$data[[j]]$text[[i]] <- strsplit(fd$x$data[[j]]$text[[i]], '<br />')[[1]][[1]]
+          }
+        }
+        
+        #The ggplotly object is then rendered.
+        
+        fd %>% 
           
           #Next, the plotly bar is disabled for aesthetic purposes.
           
-          config(displayModeBar = FALSE)
+          config(displayModeBar = FALSE) %>% 
+          
+          #The x axis is disabled so there is no zooming, which is distracting.
+          
+          layout(xaxis = list(fixedrange = TRUE)) %>% 
+          
+          #The y axis is also disabled so there is no zooming, which is distracting.
+          
+          layout(yaxis = list(fixedrange = TRUE))
         
     })
   
@@ -470,7 +624,7 @@ server <- function(input, output) {
                    
                    fill = Department)) +
         
-        #Choosing a boxplot is helpful for showing data distributions.
+        #Choosing a violin plot is helpful for showing data distributions.
         
         geom_violin() + 
         
@@ -496,20 +650,63 @@ server <- function(input, output) {
         
         #Next, the jitter is overlayed to demonstrate the density somehow
         
-        geom_jitter(width = .3, aes(text = Title)) + 
+        geom_jitter(width = .3, aes(text = paste("Course:", Title, "<br>",
+                                                 
+                                                 #The departments are good to have for convenience.
+                                                 
+                                                 "Department: ", Department, "<br>",
+                                                 
+                                                 #Next, the undergraduate enrollments are the key piece of data.
+                                                 
+                                                 "Undergraduates: ", Undergraduates, "<br>",
+                                                 
+                                                 #The graduate enrollment is good for extra information.
+                                                 
+                                                 "Graduates: ", Graduates))) +  
         
         #The minimal theme works well with the white background.
         
-        theme_minimal()
+        theme_minimal() + 
+        
+        #The legend is unnecessary in this case because the data categories are clearly labeled with axis marks
+        
+        theme(legend.position = "none")
       
       #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
       
-      ggplotly(spring_distributions) %>% 
+      sd <- ggplotly(spring_distributions)
+      
+      #The following code is necessary to clean the hover text that displays in plotly
+      
+      #This code loops through the data structure containing the labels for each department
+      
+      for (j in 1:length(sd$x$data)) {
+        
+        #Within each department, the labels are looped through
+        
+        for (i in 1:length(sd$x$data[[j]]$text)) {
+          
+          #Each label is replaced with a subset of the original label so there are no redundancies.
+          
+          sd$x$data[[j]]$text[[i]] <- strsplit(sd$x$data[[j]]$text[[i]], '<br />')[[1]][[1]]
+        }
+      }
+      
+      #Then the first department is looped through again
+      
+      sd %>% 
         
         #Next, the plotly bar is disabled for aesthetic purposes.
         
-        config(displayModeBar = FALSE)
-      
+        config(displayModeBar = FALSE) %>% 
+        
+        #The x axis is disabled so there is no zooming, which is distracting.
+        
+        layout(xaxis = list(fixedrange = TRUE)) %>% 
+        
+        #The y axis is also disabled so there is no zooming, which is distracting.
+        
+        layout(yaxis = list(fixedrange = TRUE))
     })
     
     output$fall_graduates <- renderPlotly({ 
@@ -532,17 +729,21 @@ server <- function(input, output) {
       
         ggplot(aes(x = Department, y = Graduates, fill = Department)) +
         
-        #Choosing a boxplot is helpful for showing data distributions.
+        #Choosing geom count is a good idea here because the data is sparse and the frequency is important
         
-        geom_violin() +
+        geom_count() + 
         
-        labs(title = "Distribution of Undergraduate Fall Course Graduate Enrollments by Department in Selected Year", caption = "Source: Harvard Registrar") +
+        #The size of the points is varied to show which frequencies are higher
+        
+        scale_size_area() +
+        
+        #Next, the labels are necessary to help comprehend the chart.
+        
+        labs(title = "Distribution of Undergraduate Fall Course Graduate Enrollments by Department in Selected Year", subtitle = "Point size represents frequency of courses with given number of graduate students", caption = "Source: Harvard Registrar") +
         
         #Next, the y-axis is labeled.
         
         ylab("Course Undergraduate Enrollment") +
-        
-        geom_jitter(width = .3, aes(text = Title)) +
         
         #Scaling the y axis to log 10 alloows the data to be viewed in a more compact way.
         
@@ -554,15 +755,47 @@ server <- function(input, output) {
         
         #The minimal theme works well with the white background.
         
-        theme_minimal()
+        theme_minimal() + 
+        
+        #The legend is unnecessary in this case because the data categories are clearly labeled with axis marks
+        
+        theme(legend.position = "none")
       
       #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
       
-      ggplotly(fall_graduates) %>% 
+      fg <- ggplotly(fall_graduates)
+      
+      #The following code is necessary to clean the hover text that displays in plotly
+      
+      #This code loops through the data structure containing the labels for each department
+      
+      for (j in 1:length(fg$x$data)) {
+        
+        #Within each department, the labels are looped through
+        
+        for (i in 1:length(fg$x$data[[j]]$text)) {
+          
+          #Each label is replaced with a subset of the original label so there are no redundancies.
+          
+          fg$x$data[[j]]$text[[i]] <- strsplit(fg$x$data[[j]]$text[[i]], '<br />')[[1]][[1]]
+        }
+      }
+      
+      #Then the first department is looped through again
+      
+      fg %>% 
         
         #Next, the plotly bar is disabled for aesthetic purposes.
         
-        config(displayModeBar = FALSE)
+        config(displayModeBar = FALSE) %>% 
+        
+        #The x axis is disabled so there is no zooming, which is distracting.
+        
+        layout(xaxis = list(fixedrange = TRUE)) %>% 
+        
+        #The y axis is also disabled so there is no zooming, which is distracting.
+        
+        layout(yaxis = list(fixedrange = TRUE))
     
     })
     
@@ -589,14 +822,14 @@ server <- function(input, output) {
         
         ggplot(aes(x = Department, y = Graduates, fill = Department)) +
         
-        #Choosing a boxplot is helpful for showing data distributions.
+        #Choosing geom count is a good idea here because the data is sparse and the frequency is important
         
-        geom_violin() +
+        geom_count() + 
         
-        #Next, the jitter is added to show specific courses.
+        #The size of the points is varied to show which frequencies are higher
         
-        geom_jitter(width = .3, aes(text = Title)) +
-        
+        scale_size_area() +
+
         #The labels allow the user to better understand the chart.
         
         labs(title = "Distribution of Undergraduate Spring Course Graduate Enrollments by Department in Selected Year", caption = "Source: Harvard Registrar") +
@@ -605,27 +838,62 @@ server <- function(input, output) {
         
         ylab("Course Undergraduate Enrollment") +
         
+        #The log scale is important to make the data compact.
+        
         scale_y_log10() +
+        
+        #The coordinates are flipped so they can be viewed horizontally in a more space-effecient manner.
         
         coord_flip() +
         
         #The minimal theme works well with the white background.
         
-        theme_minimal()
+        theme_minimal() + 
+        
+        #The legend is unnecessary in this case because the data categories are clearly labeled with axis marks
+        
+        theme(legend.position = "none")
       
       #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
       
-      ggplotly(spring_graduates) %>% 
+      sg <- ggplotly(spring_graduates)
+      
+      #The following code is necessary to clean the hover text that displays in plotly
+      
+      #This code loops through the data structure containing the labels for each department
+      
+      for (j in 1:length(sg$x$data)) {
         
+        #Within each department, the labels are looped through
+        
+        for (i in 1:length(sg$x$data[[j]]$text)) {
+          
+          #Each label is replaced with a subset of the original label so there are no redundancies.
+          
+          sg$x$data[[j]]$text[[i]] <- strsplit(sg$x$data[[j]]$text[[i]], '<br />')[[1]][[1]]
+        }
+      }
+      
+      #Then the first department is looped through again
+      
+      sg %>% 
+
         #Next, the plotly bar is disabled for aesthetic purposes.
         
-        config(displayModeBar = FALSE)
+        config(displayModeBar = FALSE) %>% 
+        
+        #The x axis is disabled so there is no zooming, which is distracting.
+        
+        layout(xaxis = list(fixedrange = TRUE)) %>% 
+        
+        #The y axis is also disabled so there is no zooming, which is distracting.
+        
+        layout(yaxis = list(fixedrange = TRUE))
       
       
     })
     
 
-   
     output$fall_timegraph <- renderPlotly({ 
       
       #Starting with the combined enrollment data set
@@ -640,23 +908,31 @@ server <- function(input, output) {
         
         group_by(Year, Department) %>%
         
+        #The summarize function is necessary here to compare all the undergraduates in a department by taking the total.
+        
         summarize(Total = sum(Undergraduates)) %>%
         
         #Next, one can begin the plot.
         
         ggplot(aes(x = Year, y = Total, fill = Department)) +
         
-        #Choosing a boxplot is helpful for showing data distributions.
+        #Choosing a line is helpful for connecting the dots.
         
         geom_line(aes(group = 1, color = Department)) +
         
+        #The labels are necessary for understanding the axes of the chart.
+        
         labs(title = "Total Enrollment in Fall Courses by Department Over Time", caption = "Source: Harvard Registrar") +
         
-        #Next, the y-axis is labeled.
+        #Next, the points are placed to connect the lines.
         
-        ylab("Density of Course Enrollment Size Frequency") +
+        geom_point(aes(color = Department, text = paste("Department: ", Department, "<br>",
+                                                        
+                                                        #Next, the undergraduate enrollments are the key piece of data.
+                                                        
+                                                        "Undergraduates: ", Total, "<br>"))) +
         
-        geom_point(aes(color = Department)) +
+        #The y-axis is then labeled
         
         ylab("Total Enrollments in Department Courses") +
       
@@ -666,11 +942,39 @@ server <- function(input, output) {
       
       #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
       
-      ggplotly(fall_timegraph) %>% 
+      ftg <- ggplotly(fall_timegraph)
+      
+      #The following code is necessary to clean the hover text that displays in plotly
+      
+      #This code loops through the data structure containing the labels for each department
+      
+      for (j in 1:length(ftg$x$data)) {
+        
+        #Within each department, the labels are looped through
+        
+        for (i in 1:length(ftg$x$data[[j]]$text)) {
+          
+          #Each label is replaced with a subset of the original label so there are no redundancies.
+          
+          ftg$x$data[[j]]$text[[i]] <- strsplit(ftg$x$data[[j]]$text[[i]], '<br />')[[1]][[1]]
+        }
+      }
+      
+      #Then the first department is looped through again
+      
+      ftg %>% 
         
         #Next, the plotly bar is disabled for aesthetic purposes.
         
-        config(displayModeBar = FALSE)
+        config(displayModeBar = FALSE) %>% 
+        
+        #The x axis is disabled so there is no zooming, which is distracting.
+        
+        layout(xaxis = list(fixedrange = TRUE)) %>% 
+        
+        #The y axis is also disabled so there is no zooming, which is distracting.
+        
+        layout(yaxis = list(fixedrange = TRUE))
       
     })
     
@@ -696,13 +1000,19 @@ server <- function(input, output) {
         
         ggplot(aes(x = Year, y = Total, fill = Department)) +
         
-        #Choosing a boxplot is helpful for showing data distributions.
+        #Choosing a line graph is helpful to connect the dots.
         
         geom_line(aes(group = 1, color = Department)) +
       
         #Next, the points are placed to connect the lines.
         
-        geom_point(aes(color = Department)) +
+        geom_point(aes(color = Department, text = paste("Department: ", Department, "<br>",
+                                                        
+                                                        #Next, the undergraduate enrollments are the key piece of data.
+                                                        
+                                                        "Undergraduates: ", Total, "<br>"))) +
+        
+        #The labels are necessary for understanding the axes of the chart.
         
         labs(title = "Total Enrollment in Spring Courses by Department Over Time", caption = "Source: Harvard Registrar") +
         
@@ -716,12 +1026,39 @@ server <- function(input, output) {
       
       #Next, the ggplot is wrapped in a plotly call in order to display the chart as a plotly chart.
       
-      ggplotly(spring_timegraph) %>% 
+      stg <- ggplotly(spring_timegraph)
+      
+      #The following code is necessary to clean the hover text that displays in plotly
+      
+      #This code loops through the data structure containing the labels for each department
+      
+      for (j in 1:length(stg$x$data)) {
+        
+        #Within each department, the labels are looped through
+        
+        for (i in 1:length(stg$x$data[[j]]$text)) {
+          
+          #Each label is replaced with a subset of the original label so there are no redundancies.
+          
+          stg$x$data[[j]]$text[[i]] <- strsplit(stg$x$data[[j]]$text[[i]], '<br />')[[1]][[1]]
+        }
+      }
+      
+      #Then the first department is looped through again
+      
+      stg %>% 
         
         #Next, the plotly bar is disabled for aesthetic purposes.
         
-        config(displayModeBar = FALSE)
-      
+        config(displayModeBar = FALSE) %>% 
+        
+        #The x axis is disabled so there is no zooming, which is distracting.
+        
+        layout(xaxis = list(fixedrange = TRUE)) %>% 
+        
+        #The y axis is also disabled so there is no zooming, which is distracting.
+        
+        layout(yaxis = list(fixedrange = TRUE))
       
     })
     
