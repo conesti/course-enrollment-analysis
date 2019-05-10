@@ -166,7 +166,7 @@ ui <- navbarPage("Course Enrollment Analysis",
                     
                     #The departments input is necessary to only show data from selected departments.
                     
-                    selectInput("departments", "Departments", choices = c("Economics",
+                    selectInput("graduate_departments", "Departments", choices = c("Economics",
                                                                   "Government",
                                                                   "Computer Science",
                                                                   "Statistics",
@@ -256,292 +256,16 @@ server <- function(input, output) {
     }
   }
   
-  #One begins withi the first data set for the 2018 data
+  #The data is stored in an rds file contained within the repository so that the charts can update more quickly.
+  #I decided to do this because I was experiencing slow update times.
   
-  enrollment_eighteen_fall <- read_excel("fall_course_enrollment_analysis/fall_2018.xlsx", skip = 2) %>% 
-    
-    #Next, one filters the courses where the title is NA
-    
-    filter(!is.na(`Course Title`)) %>% 
-    
-    #Next, one is only intersted in courses with more than 3 people in order to not include tutorials and the like.
-    
-    filter(UGrad >= 3) %>% 
-    
-    #Next, one is only interstested in certain columns, so they are not selected here.
-    
-    select(ID =`Course ID`, 
-           
-           #The title is named Title
-           
-           Title = `Course Title`, 
-           
-           #Next, the department variable is also named in a simple way
-           
-           Department = `Course Department`,
-           
-           #Next one has undergraduates labeled.
-           
-           Undergraduates = `UGrad`,
-           
-           #Next, the graduates are labeled as well in a way that is presentable to appear on a chart to avoid unnecessary work later.
-           
-           Graduates = `Grad`)
+  #There is an r script file that was used to make these rds files, which is also included in the repository.
   
+  enrollment_fall <- read_rds("fall_enrollment.rds")
   
-  #The next step is to fulfill this same code execution with the other years so that the data can later be combined.
+  #The spring data is loaded as well.
   
-  enrollment_seventeen_fall <- read_excel("fall_course_enrollment_analysis/fall_2017.xlsx", skip = 3) %>% 
-    
-    #Then one is only interested in course entries, not totals.
-    
-    filter(!is.na(`Course Title`)) %>% 
-    
-    #Next, one is only interested in courses with a significant number of undergraduates.
-    
-    filter(UGrad >= 3) %>% 
-    
-    #Next, one is only interested in this part of the data.
-    
-    select(ID =`Course ID`, 
-           
-          #Title replaces "Course Title" for a simpler name
-           
-           Title = `Course Title`, 
-          
-          #Department is used to refer to Course Department
-          
-           Department = `Course Department`, 
-          
-          #Undergraduates is then used for the undergraduate count
-          
-           Undergraduates = `UGrad`,
-           
-           Graduates = `Grad`)
-  
-  enrollment_sixteen_fall <- read_excel("fall_course_enrollment_analysis/fall_2016.xlsx", skip = 3) %>% 
-    
-    #Then one is only interested in course entries, not totals.
-    
-    filter(!is.na(`Course Title`)) %>% 
-    
-    #Next, one is only interested in courses with a significant number of undergraduates.
-    
-    filter(UGrad >= 3) %>% 
-    
-    #Next, one is only interested in this part of the data.
-    
-    select(ID =`Course ID`, 
-           
-           #Setting the title of Course titles to be "Title" for simplicity
-           
-           Title = `Course Title`, 
-           
-           #Department undergoes a similar cleaning
-           
-           Department = `Course Department`, 
-           
-           #The same for enrolled
-           
-           Undergraduates = `UGrad`,
-           
-           Graduates = `Grad`)
-  
-  #Next, one is interested in compiling 2015 fall data
-  
-  enrollment_fifteen_fall <- read_excel("fall_course_enrollment_analysis/fall_2015.xlsx", skip = 0) %>% 
-    
-    #Then one is only interested in course entries, not totals.
-    
-    filter(!is.na(`COURSE ID`)) %>%
-    
-    #Next, one is only interested in courses with a significant number of undergraduates.
-    
-    filter(HCOL >= 3) %>% 
-    
-    #Next, one is only interested in this part of the data.
-    
-    select(ID = `COURSE ID`, 
-           
-           #The course title is standardized first.
-           
-           Title = `COURSE`, 
-           
-           #Next the department label is standardized.
-           
-           Department = `DEPARTMENT`, 
-           
-           #The number of Harvard college students or undergraduates is labeled according to the standard.
-           
-           Undergraduates = `HCOL`,
-           
-           #The graduate count is also labeled.
-           
-           Graduates = `GSAS`)
-  
-  #Next, one combines all the data into one large dataset so that they can all be accessed in the same place.
-  
-  enrollment_fall <- bind_rows("2018" = enrollment_eighteen_fall, 
-                          
-                          #And for 2017
-                          
-                          "2017" = enrollment_seventeen_fall, 
-                          
-                          #And for 2016
-                          
-                          "2016" = enrollment_sixteen_fall, 
-                          
-                          #And for 2015
-                          
-                          "2015" = enrollment_fifteen_fall, 
-                          
-                          #Then the id is set to year so that one retains which year each row refers to
-                          
-                          .id = "Year") %>% filter(Undergraduates > Graduates)
-  
-  
-  enrollment_sixteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2016.xlsx", skip = 0) %>% 
-    
-    #Then one is only interested in course entries, not totals.
-    
-    filter(!is.na(`COURSE ID`)) %>%
-    
-    #Next, one is only interested in courses with a significant number of undergraduates.
-    
-    filter(HCOL >= 3) %>% 
-    
-    #Next, one is only interested in this part of the data.
-    
-    select(ID =`COURSE ID`, 
-           
-           #The course titles are labeled.
-           
-           Title = `COURSE`, 
-           
-           #The departments are labeled as well.
-           
-           Department = `DEPARTMENT`, 
-           
-           #Next, the undergraduates counts are labeled
-           
-           Undergraduates = `HCOL`,
-           
-           #The graduate counts are labeled as well.
-           
-           Graduates = `GSAS`)
-  
-  
-  enrollment_seventeen_spring <- read_excel("fall_course_enrollment_analysis/spring_2017.xlsx", skip = 3) %>% 
-    
-    #Then one is only interested in course entries, not totals.
-    
-    filter(!is.na(`Course ID`)) %>%
-    
-    #Next, one is only interested in courses with a significant number of undergraduates.
-    
-    filter(UGrad >= 3) %>% 
-    
-    #Next, one is only interested in this part of the data.
-    
-    select(ID =`Course ID`, 
-           
-           #Setting the title of Course titles to be "Title" for simplicity
-           
-           Title = `Course Title`, 
-           
-           #Department undergoes a similar cleaning
-           
-           Department = `Course Department`, 
-           
-           #The same for enrolled
-           
-           Undergraduates = `UGrad`,
-           
-           #The graduates are also labeled.
-           
-           Graduates = `Grad`)
-  
-  
-  enrollment_eighteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2018.xlsx", skip = 3) %>% 
-    
-    #Then one is only interested in course entries, not totals.
-    
-    filter(!is.na(`Course ID`)) %>%
-    
-    #Next, one is only interested in courses with a significant number of undergraduates.
-    
-    filter(UGrad >= 3) %>% 
-    
-    #Next, one is only interested in this part of the data.
-    
-    select(ID =`Course ID`, 
-           
-           #Setting the title of Course titles to be "Title" for simplicity
-           
-           Title = `Course Title`, 
-           
-           #Department undergoes a similar cleaning
-           
-           Department = `Course Department`, 
-           
-           #The same for enrolled
-           
-           Undergraduates = `UGrad`,
-           
-           #The graduates are also labeled.
-           
-           Graduates = `Grad`)
-  
-  enrollment_nineteen_spring <- read_excel("fall_course_enrollment_analysis/spring_2019.xlsx", skip = 3) %>% 
-    
-    #Then one is only interested in course entries, not totals.
-    
-    filter(!is.na(`Course ID`)) %>%
-    
-    #Next, one is only interested in courses with a significant number of undergraduates.
-    
-    filter(UGrad >= 3) %>% 
-    
-    #Next, one is only interested in this part of the data.
-    
-    select(ID =`Course ID`, 
-           
-           #Setting the title of Course titles to be "Title" for simplicity
-           
-           Title = `Course Title`, 
-           
-           #Department undergoes a similar cleaning
-           
-           Department = `Course Department`, 
-           
-           #The same for enrolled
-           
-           Undergraduates = `UGrad`,
-           
-           #The graduates are also labeled.
-           
-           Graduates = `Grad`)
-  
-  
-  enrollment_spring <- bind_rows("2018" = enrollment_eighteen_spring, 
-                               
-                               #And for 2017
-                               
-                               "2017" = enrollment_seventeen_spring, 
-                               
-                               #And for 2016
-                               
-                               "2016" = enrollment_sixteen_spring, 
-                               
-                               #And for 2019
-                               
-                               "2019" = enrollment_nineteen_spring, 
-                               
-                               #Then the id is set to year so that one retains which year each row refers to
-                               
-                               .id = "Year") %>% filter(Graduates < Undergraduates)
-  
-  
+  enrollment_spring <- read_rds("spring_enrollment.rds")
   
   
   #One begins with the first plot.
@@ -562,7 +286,7 @@ server <- function(input, output) {
     
     #Then the top 8 courses are selected.    
       
-    slice(1:10) %>% 
+    slice(1:8) %>% 
     
     #Next, one begins the plot with courses on the x axis and the number of enrolled students on the y axis    
       
@@ -614,7 +338,7 @@ server <- function(input, output) {
       
       #Then the top 8 courses are selected.    
       
-      slice(1:10) %>% 
+      slice(1:8) %>% 
       
       #Next, one begins the plot with courses on the x axis and the number of enrolled students on the y axis    
       
@@ -635,8 +359,6 @@ server <- function(input, output) {
       #The y axis follows.
       
       ylab("Number of Enrolled Undergraduates") + 
-      
-      #The minimal theme is applied for aesthetic purposes
       
       #The minimal theme works well with the white background.
       
@@ -705,7 +427,7 @@ server <- function(input, output) {
         
         #Next, the jitter is overlayed to demonstrate the density somehow
         
-        geom_jitter(width = .3) + 
+        geom_jitter(width = .3, aes(text = Title)) + 
           
         #The minimal theme works well with the white background.
         
@@ -774,7 +496,7 @@ server <- function(input, output) {
         
         #Next, the jitter is overlayed to demonstrate the density somehow
         
-        geom_jitter(width = .3, aes(text = sprintf(Title))) + 
+        geom_jitter(width = .3, aes(text = Title)) + 
         
         #The minimal theme works well with the white background.
         
@@ -800,7 +522,7 @@ server <- function(input, output) {
         
         #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
         
-        filter(Department %in% input$departments) %>%
+        filter(Department %in% input$graduate_departments) %>%
         
         #This function then filters the data so only the selected year is shown.
         
@@ -814,15 +536,19 @@ server <- function(input, output) {
         
         geom_violin() +
         
-        labs(title = "Distribution of Undergraduate Spring Course Graduate Enrollments by Department in Selected Year", caption = "Source: Harvard Registrar") +
+        labs(title = "Distribution of Undergraduate Fall Course Graduate Enrollments by Department in Selected Year", caption = "Source: Harvard Registrar") +
         
         #Next, the y-axis is labeled.
         
         ylab("Course Undergraduate Enrollment") +
         
-        geom_jitter(width = .3, aes(text = sprintf(Title))) +
+        geom_jitter(width = .3, aes(text = Title)) +
+        
+        #Scaling the y axis to log 10 alloows the data to be viewed in a more compact way.
         
         scale_y_log10() +
+        
+        #Next, the coordinates are flipped so the graph can be used horizontally.
         
         coord_flip() +
         
@@ -847,15 +573,17 @@ server <- function(input, output) {
       
       spring_graduates <- enrollment_spring %>%
         
+        #One is interested in only courses that have some graduate students to avoid a heavy skew at 0
+        
         filter(Graduates > 0) %>% 
         
         #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
         
-        filter(Department %in% input$departments) %>%
+        filter(Department %in% input$graduate_departments) %>%
         
         #This function then filters the data so only the selected year is shown.
         
-        filter(Year == fall_function(input$graduate_year)) %>%
+        filter(Year == spring_function(input$graduate_year)) %>%
         
         #Next, one can begin the plot.
         
@@ -865,7 +593,11 @@ server <- function(input, output) {
         
         geom_violin() +
         
-        geom_jitter(width = .3, aes(text = sprintf(Title))) +
+        #Next, the jitter is added to show specific courses.
+        
+        geom_jitter(width = .3, aes(text = Title)) +
+        
+        #The labels allow the user to better understand the chart.
         
         labs(title = "Distribution of Undergraduate Spring Course Graduate Enrollments by Department in Selected Year", caption = "Source: Harvard Registrar") +
         
