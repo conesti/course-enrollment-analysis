@@ -154,7 +154,7 @@ ui <- navbarPage("Course Enrollment Analysis",
                    
         #The next panel covers the distribution of graduate students across undergraduate courses in each department.
          
-        tabPanel("Graduate vs. Undergraduate Enrollment", 
+        tabPanel("Graduate Enrollment in Undergraduate Courses", 
                  
                   #The sidebar panel is a place to customize the data and filter it.
                  
@@ -354,6 +354,10 @@ server <- function(input, output) {
       
       labs(title = "Largest Fall Classes in Selected Year", caption = "Source: Harvard Registrar") +
       
+      #The limits are set to a standard amount for consistency
+      
+      ylim(0, 800) +
+      
       #Next, the axis is labeled clearly.
       
       xlab("Course Title") +
@@ -396,11 +400,11 @@ server <- function(input, output) {
       
       #The x axis is disabled so there is no zooming, which is distracting.
       
-      layout(xaxis = list(fixedrange=TRUE)) %>% 
+      layout(xaxis = list(fixedrange = TRUE)) %>% 
       
       #The y axis is also disabled so there is no zooming, which is distracting.
       
-      layout(yaxis = list(fixedrange=TRUE))
+      layout(yaxis = list(fixedrange = TRUE))
     
   })
   
@@ -434,8 +438,12 @@ server <- function(input, output) {
       
       labs(title = "Largest Spring Courses in Selected Year", caption = "Source: Harvard Registrar") +
       
-      #Next, the axis is labeled clearly.
+      #The limits are set to a standard amount for consistency
       
+      ylim(0, 800) +
+      
+      #Next, the axis is labeled clearly.
+  
       xlab("Course Title") +
       
       #The y axis follows.
@@ -476,11 +484,11 @@ server <- function(input, output) {
       
       #The x axis is disabled so there is no zooming, which is distracting.
       
-      layout(xaxis = list(fixedrange=TRUE)) %>% 
+      layout(xaxis = list(fixedrange = TRUE)) %>% 
       
       #The y axis is also disabled so there is no zooming, which is distracting.
       
-      layout(yaxis = list(fixedrange=TRUE))
+      layout(yaxis = list(fixedrange = TRUE))
     
     
   })
@@ -634,7 +642,7 @@ server <- function(input, output) {
         
         #Next, the y-axis is labeled.
         
-        ylab("Course Undergraduate Enrollment") +
+        ylab("Density of Course Enrollment Size Frequency") +
         
         #Next, the x-axis is labeled.
         
@@ -715,6 +723,8 @@ server <- function(input, output) {
       
       fall_graduates <- enrollment_fall %>%
         
+        #One is only interested in courses with graduates enrolled.
+        
         filter(Graduates > 0) %>% 
         
         #Next, for this phase, one is concerned with only a subset of the departments.  This will change later.
@@ -739,11 +749,11 @@ server <- function(input, output) {
         
         #Next, the labels are necessary to help comprehend the chart.
         
-        labs(title = "Distribution of Undergraduate Fall Course Graduate Enrollments by Department in Selected Year", subtitle = "Point size represents frequency of courses with given number of graduate students", caption = "Source: Harvard Registrar") +
+        labs(title = "Undergraduate Fall Course Graduate Enrollments by Department in Selected Year", subtitle = "Point size represents frequency of courses with given number of graduate students", caption = "Source: Harvard Registrar") +
         
         #Next, the y-axis is labeled.
         
-        ylab("Course Undergraduate Enrollment") +
+        ylab("Course Graduate Enrollment") +
         
         #Scaling the y axis to log 10 alloows the data to be viewed in a more compact way.
         
@@ -832,11 +842,11 @@ server <- function(input, output) {
 
         #The labels allow the user to better understand the chart.
         
-        labs(title = "Distribution of Undergraduate Spring Course Graduate Enrollments by Department in Selected Year", caption = "Source: Harvard Registrar") +
+        labs(title = "Undergraduate Spring Course Graduate Enrollments by Department in Selected Year", caption = "Source: Harvard Registrar") +
         
         #Next, the y-axis is labeled.
         
-        ylab("Course Undergraduate Enrollment") +
+        ylab("Course Graduate Enrollment") +
         
         #The log scale is important to make the data compact.
         
@@ -1154,6 +1164,7 @@ server <- function(input, output) {
       <p align = center style = 'margin-left:20%; margin-right: 20%'>Ever wonder what the major trends are in course enrollment?  
       Using a public dataset on the Harvard Registrar, this Shiny app lets users visualize various presentations of the data from different angles.  
       Each tab demonstrates a different segment of the data and there is a customizable interactive form on the top left of every page for the user to filter the data how they see fit.  
+      All courses, unless otherwise specified, are undergraduate courses, which are defined as courses with at least three undergraduates and a majority of undergraduate students.
       Feel free to browse through!</p>
       <h4 align = center>Contact and Info</h4>
       <p align = center>Email: chrisonesti@college.harvard.edu
