@@ -1,0 +1,12 @@
+name: course-enrollment-analysis
+title: course-enrollment-analysis
+username:
+account: thrinacia
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 923236
+bundleId: 2076424
+url: https://thrinacia.shinyapps.io/course-enrollment-analysis/
+when: 1557537632.6506
+asMultiple: FALSE
+asStatic: FALSE
