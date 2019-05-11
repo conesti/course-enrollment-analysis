@@ -1154,7 +1154,7 @@ server <- function(input, output) {
       Feel free to browse through!</p>
       <h4 align = center>Contact and Info</h4>
       <p align = center>Email: chrisonesti@college.harvard.edu
-      <p align = center>GitHub Link: <a href = https://github.com/conesti/fall-course-enrollment-analysis>https://github.com/conesti/fall-course-enrollment-analysis</a>"
+      <p align = center>GitHub Link: <a href = https://github.com/conesti/course-enrollment-analysis>https://github.com/conesti/course-enrollment-analysis</a>"
       
     })
     
