@@ -300,5 +300,11 @@ library(plotly)
                                  
                                  .id = "Year") %>% filter(Graduates < Undergraduates)
   
+  #This function writes the newly created data to an rds file for quick reading.
   
+  write_rds(enrollment_fall, "fall_enrollment.rds")
+  
+  #This function writes the newly created data to an rds file for quick reading.
+  
+  write_rds(enrollment_spring, "spring_enrollment.rds")
   

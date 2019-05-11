@@ -38,7 +38,6 @@ ui <- navbarPage("Course Enrollment Analysis",
                                                                                                                        "Statistics",
                                                                                                                        "African & African Amer Studies",
                                                                                                                        "Anthropology",
-                                                                                                                       "Applied Computation",
                                                                                                                        "Applied Mathematics",
                                                                                                                        "Applied Physics",
                                                                                                                        "Astronomy",
@@ -113,7 +112,6 @@ ui <- navbarPage("Course Enrollment Analysis",
                                                                                                                                                           "Statistics",
                                                                                                                                                           "African & African Amer Studies",
                                                                                                                                                           "Anthropology",
-                                                                                                                                                          "Applied Computation",
                                                                                                                                                           "Applied Mathematics",
                                                                                                                                                           "Applied Physics",
                                                                                                                                                           "Astronomy",
@@ -172,7 +170,6 @@ ui <- navbarPage("Course Enrollment Analysis",
                                                                   "Statistics",
                                                                   "African & African Amer Studies",
                                                                   "Anthropology",
-                                                                  "Applied Computation",
                                                                   "Applied Mathematics",
                                                                   "Applied Physics",
                                                                   "Astronomy",
@@ -553,11 +550,7 @@ server <- function(input, output) {
                                                  
                                                  #Next, the undergraduate enrollments are the key piece of data.
                                                  
-                                                 "Undergraduates: ", Undergraduates, "<br>",
-                                                 
-                                                 #The graduate enrollment is good for extra information.
-                                                 
-                                                 "Graduates: ", Graduates))) + 
+                                                 "Undergraduates: ", Undergraduates))) + 
           
         #The minimal theme works well with the white background.
         
@@ -666,11 +659,7 @@ server <- function(input, output) {
                                                  
                                                  #Next, the undergraduate enrollments are the key piece of data.
                                                  
-                                                 "Undergraduates: ", Undergraduates, "<br>",
-                                                 
-                                                 #The graduate enrollment is good for extra information.
-                                                 
-                                                 "Graduates: ", Graduates))) +  
+                                                 "Undergraduates: ", Undergraduates))) +  
         
         #The minimal theme works well with the white background.
         
@@ -926,21 +915,21 @@ server <- function(input, output) {
         
         ggplot(aes(x = Year, y = Total, fill = Department)) +
         
-        #Choosing a line is helpful for connecting the dots.
-        
-        geom_line(aes(group = 1, color = Department)) +
-        
         #The labels are necessary for understanding the axes of the chart.
         
         labs(title = "Total Enrollment in Fall Courses by Department Over Time", caption = "Source: Harvard Registrar") +
         
-        #Next, the points are placed to connect the lines.
+        #Next, the points are great and simple indicators.
         
         geom_point(aes(color = Department, text = paste("Department: ", Department, "<br>",
                                                         
                                                         #Next, the undergraduate enrollments are the key piece of data.
                                                         
                                                         "Undergraduates: ", Total, "<br>"))) +
+        
+        #Choosing a line is helpful for connecting the dots.
+        
+        geom_line(aes(group = 1, color = Department)) +
         
         #The y-axis is then labeled
         
@@ -1173,6 +1162,8 @@ server <- function(input, output) {
     })
     
 }
+
+#Briefly consulted internet and classmates's shiny apps/GitHub repos
 
 # Run the application 
 shinyApp(ui = ui, server = server)
