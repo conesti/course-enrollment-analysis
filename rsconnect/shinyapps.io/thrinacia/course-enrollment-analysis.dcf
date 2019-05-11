@@ -5,8 +5,8 @@ account: thrinacia
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 923236
-bundleId: 2076452
+bundleId: 2076454
 url: https://thrinacia.shinyapps.io/course-enrollment-analysis/
-when: 1557539310.13928
+when: 1557539629.28271
 asMultiple: FALSE
 asStatic: FALSE
