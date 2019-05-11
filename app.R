@@ -1153,7 +1153,7 @@ server <- function(input, output) {
       All courses, unless otherwise specified, are undergraduate courses, which are defined as courses with at least three undergraduates and a majority of undergraduate students.
       Feel free to browse through!</p>
       <h4 align = center>Contact and Info</h4>
-      <p align = center>Email: chrisonesti@college.harvard.edu
+      <p align = center>Email: chrisonesti@gmail.com
       <p align = center>GitHub Link: <a href = https://github.com/conesti/course-enrollment-analysis>https://github.com/conesti/course-enrollment-analysis</a>"
       
     })
